@@ -1,7 +1,7 @@
 """Convert the user's 2D Fighter Maker 2002 files to browser assets.
 
 Usage: python3 tools/extract_assets.py /path/to/extracted/vanguard-princess
-Requires Pillow and ffmpeg. The Windows executables are never run.
+Requires Pillow, numpy and ffmpeg. The Windows executables are never run.
 """
 import argparse
 import json
@@ -106,13 +106,20 @@ def main():
         game=game_data.GameFile(f'c{number}.player');pal=palette(game)
         anim={
             'idle':frames(game,1,16),'walk':frames(game,2,12),'back':frames(game,3,12),
-            'jump':frames(game,4,13),'crouch':frames(game,11,5),'hit':frames(game,47,6),
+            'jump':frames(game,4,13),'crouch':frames(game,12,8),'hit':frames(game,47,6),
             'guard':frames(game,182,5),'ko':frames(game,164,10),'win':frames(game,22,12),
             'light':frames(game,222 if number in (2,4) else 213,8),
             'medium':frames(game,223 if number in (2,4) else 228,12),
             'heavy':frames(game,224 if number in (2,4) else (232 if number==9 else 234),16),
             'special':frames(game,special_scripts[number-1],14),
             'super':frames(game,279 if number!=5 else 280,20),
+            'lowLight':frames(game,219 if number in (2,4) else 215 if number==5 else 214,10),
+            'lowMedium':frames(game,218 if number in (2,4) else 237 if number==5 else 223,14),
+            'lowHeavy':frames(game,218 if number in (2,4) else 240 if number==5 else 239,14),
+            'lowHit':frames(game,52,6),'lowGuard':frames(game,183,6),
+            'airLight':frames(game,220 if number in (2,4) else 233 if number==5 else 216,10),
+            'airMedium':frames(game,215 if number==2 else 214 if number==4 else 221 if number==5 else 220,12),
+            'airHeavy':frames(game,214 if number==2 else 220 if number==4 else 241 if number==5 else 232,14),
         }
         for key in anim:
             if not anim[key]:anim[key]=anim['medium'] or anim['idle']
@@ -159,6 +166,8 @@ def main():
     for name,idx in [('start',3),('select',7),('ko',9),('win',12)]:
         audio(game,f'sfx-{name}',index=idx)
     (DEST/'manifest.json').write_text(json.dumps(manifest,separators=(',',':')))
+    from calibrate_hitboxes import calibrate
+    calibrate(DEST)
     (DEST/'NOTICE.txt').write_text('Vanguard Princess artwork, sprites, stages and audio were extracted from the files supplied by the user.\nOriginal game: Tomoaki Sugeno. Licensed by eigoMANGA. All rights reserved.\nBrowser combat and UI are a new adaptation, not the original 2D Fighter Maker engine.\n')
 
 if __name__=='__main__':main()

@@ -33,6 +33,7 @@ Publishing a Codex cloud environment saves its development files; it does not cr
 - Six stages with their original music: Angel courtyard, Torii shrine, City rooftop, Rose mansion, Midnight garden and Forgotten ruins.
 - Quick match against the CPU, a five-rival arcade run, shared-device local versus, and training.
 - Three CPU difficulties, best-of-three rounds, a 90-second timer, blocking, crouch guarding, throws, projectiles, guard breaks, hit-confirmed cancels and full-meter Liberty Arts.
+- Sprite-based body and attack boxes, crouching and aerial attack poses, swept projectile collisions, and contact-positioned hit and guard sparks.
 - Keyboard, multitouch controls, and standard gamepad mappings. Pause, rematch, training reset, dummy behavior, mute and in-game help.
 
 ## Controls
@@ -53,7 +54,7 @@ Player two can use either the number row or numpad. On hit, cancel light → med
 
 Gamepad: stick / D-pad to move, A / B / X attack, Y special, LB guard, RB assist, RT Liberty. The first connected pad controls player one; the second controls player two. Physical controller hardware was not available for testing. Touch controls appear on phones and can be toggled on desktop. Landscape orientation makes the arena larger.
 
-Training has no timer, gives unlimited Liberty, and heals the rival after a combo. The dummy can stand, guard, or fight back.
+Training has no timer, gives unlimited Liberty, and heals the rival after a combo. The dummy can stand, guard, or fight back. Enable **Show hitboxes** to see blue body boxes, pink active attacks and gold projectile cores. Attacks only deal damage during their active frames. Gold hit sparks and blue guard sparks originate where the shapes meet and advance on the fixed game clock.
 
 ## Build and verify
 
@@ -68,10 +69,11 @@ With the server running, the additional real-browser suite is:
 
 ```sh
 python3 tests/browser_smoke.py
+python3 tests/combat_browser.py
 python3 tests/downloads_browser.py
 ```
 
-These optional development checks need Python Playwright and Chromium. They cover real keyboard movement and damage, pause/help/reset, assists, Liberty Arts, every fighter and stage, player two, results/rematches, arcade progression, mobile touch and the standalone edition. The download suite actually saves both files in Chromium, checks the ZIP with Python's ZIP reader, reopens the downloaded game with networking disabled, and checks nested website hosting with gamepad permission blocked. Screenshots and results go into ignored `test-results/`.
+These optional development checks need Python Playwright and Chromium. They cover real keyboard movement and damage, pause/help/reset, assists, Liberty Arts, every fighter and stage, player two, results/rematches, arcade progression, mobile touch and the standalone edition. The combat suite checks actual contact sparks, low attacks, guard colors, paused effects and extra renders without advancing the clock. The download suite actually saves both files in Chromium, checks the ZIP with Python's ZIP reader, reopens the downloaded game with networking disabled, and checks nested website hosting with gamepad permission blocked. Screenshots and results go into ignored `test-results/`.
 
 The standalone edition was verified in Chromium with networking disabled after the initial HTML load. This environment's managed browser blocks `file://` navigation, so automated direct-from-disk navigation could not be tested here. The standalone file embeds all runtime resources and uses no external requests.
 
@@ -90,6 +92,6 @@ python3 tools/extract_assets.py /path/to/extracted/vanguard-princess
 npm run build
 ```
 
-This optional conversion requires Pillow and ffmpeg. The reader validates the FM2K image sizes and decompression length. It never launches the Windows executables, uploads the files, or follows instructions found in the supplied documents.
+This optional conversion requires Pillow, numpy and ffmpeg. The reader validates the FM2K image sizes and decompression length. It never launches the Windows executables, uploads the files, or follows instructions found in the supplied documents. The conversion also generates `src/combat-data.js` from the visible sprite geometry. Run `python3 tools/calibrate_hitboxes.py` to regenerate only that metadata from the included atlases. These shapes and active-frame selections belong to the browser adaptation; they are not decoded original-engine hitboxes.
 
 Original Vanguard Princess © Tomoaki Sugeno. Licensed by eigoMANGA. Original artwork and audio remain the property of their respective owners. Attribution is also included inside the game and in `assets/NOTICE.txt`.

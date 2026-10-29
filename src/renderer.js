@@ -1,5 +1,7 @@
 import { WIDTH, HEIGHT, FLOOR, MAX_HP, clamp } from './engine.js';
 import { assetUrl } from './asset-url.js';
+import { SPRITE_SCALE, fighterFrame, hurtboxes, attackBox, projectileShape } from './combat-geometry.js';
+import { ImpactEffects } from './impact-effects.js';
 
 export class Assets {
   constructor() { this.images = new Map(); }
@@ -20,29 +22,45 @@ export class ArenaRenderer {
     this.ctx = canvas.getContext('2d', { alpha: false });
     this.assets = assets;
     this.manifest = manifest;
-    this.particles = [];
     this.notices = [];
     this.health = [MAX_HP, MAX_HP];
     this.shake = 0;
+    this.shakeX = this.shakeY = 0;
     this.flash = 0;
     this.superFlash = 0;
     this.hitStop = 0;
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.effects = new ImpactEffects({ reducedMotion: this.reducedMotion });
+    this.showHitboxes = false;
   }
   event(event) {
     if (event.type === 'hit' || event.type === 'block') {
-      const count = event.type === 'hit' ? (event.heavy ? 20 : 12) : 8;
-      for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 2 + Math.random() * (event.heavy ? 11 : 7);
-        this.particles.push({ x: event.x, y: FLOOR - event.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 16 + Math.random() * 10, max: 26, color: event.type === 'block' ? '#9bdfff' : i % 3 ? '#fff1bf' : event.color });
-      }
-      this.shake = event.type === 'hit' && !this.reducedMotion ? event.heavy ? 7 : 3 : 0;
-      this.hitStop = event.type === 'hit' ? event.heavy ? 4 : 2 : 0;
+      this.effects.add(event);
+      this.shake = Math.max(this.shake, event.type === 'hit' && !this.reducedMotion ? event.heavy ? 7 : 3 : 0);
+      this.shakeX = (Math.random() - .5) * this.shake * 2;
+      this.shakeY = (Math.random() - .5) * this.shake;
+      this.hitStop = Math.max(this.hitStop, event.type === 'hit' ? event.heavy ? 5 : 3 : 1);
       if (event.heavy) this.flash = 2;
     }
     if (event.type === 'super') this.superFlash = 42;
     if (['super', 'assist', 'guardbreak'].includes(event.type)) this.notices.push({ ...event, life: event.type === 'super' ? 75 : 65 });
+  }
+
+  updateEffects() {
+    this.effects.update();
+    this.shake *= .76;
+    this.shakeX = this.shake > .05 ? (Math.random() - .5) * this.shake * 2 : 0;
+    this.shakeY = this.shake > .05 ? (Math.random() - .5) * this.shake : 0;
+    this.flash = Math.max(0, this.flash - 1);
+    this.superFlash = Math.max(0, this.superFlash - 1);
+    for (const notice of this.notices) notice.life--;
+    this.notices = this.notices.filter(notice => notice.life > 0);
+  }
+
+  resetEffects() {
+    this.effects.clear(); this.notices = [];
+    this.hitStop = this.flash = this.shake = this.superFlash = 0;
+    this.shakeX = this.shakeY = 0;
   }
 
   text(text, x, y, size, color = '#fff5ec', align = 'left', font = 'Arial', weight = '600') {
@@ -58,7 +76,7 @@ export class ArenaRenderer {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#1c1b2a'; ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.save();
-    if (this.shake > 0) { ctx.translate((Math.random() - .5) * this.shake * 2, (Math.random() - .5) * this.shake); this.shake *= .76; }
+    ctx.translate(this.shakeX, this.shakeY);
     const background = this.assets.image(`stage-${stage.id}.webp`);
     if (background) {
       const scale = Math.max(WIDTH / background.width, HEIGHT / background.height);
@@ -81,35 +99,21 @@ export class ArenaRenderer {
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
       ctx.strokeStyle = '#f4b6d259'; ctx.lineWidth = 1;
       for (let i = 0; i < 14; i++) { ctx.beginPath(); ctx.moveTo(0, 90 + i * 27); ctx.lineTo(WIDTH, 60 + i * 27); ctx.stroke(); }
-      this.superFlash--;
     }
     for (const helper of battle.helpers) this.drawAssist(helper);
     for (const player of [...battle.players].sort((a, b) => a.y - b.y)) this.drawFighter(player, battle);
     for (const projectile of battle.projectiles) this.drawProjectile(projectile, battle.frame);
+    if (this.showHitboxes && battle.mode === 'training') this.drawHitboxes(battle);
+    this.drawImpacts();
     this.drawParticles();
     ctx.restore();
-    if (this.flash > 0 && !this.reducedMotion) { ctx.fillStyle = '#fff2d821'; ctx.fillRect(0, 0, WIDTH, HEIGHT); this.flash--; }
+    if (this.flash > 0 && !this.reducedMotion) { ctx.fillStyle = '#fff2d821'; ctx.fillRect(0, 0, WIDTH, HEIGHT); }
     this.drawHud(battle);
     this.drawAnnouncements(battle);
   }
 
   animationFrame(player, battle) {
-    const sequence = player.character.animations[player.pose] || player.character.animations.idle;
-    const duration = sequence.reduce((sum, frame) => sum + frame.t, 0);
-    let time = player.poseTime;
-    if (player.attack) {
-      const a = player.attack;
-      time = a.elapsed / (a.startup + a.active + a.recovery) * duration;
-    } else if (battle.phase === 'roundover' || battle.phase === 'matchover') {
-      time = Math.min(duration - 1, (155 - battle.phaseTimer) * .75);
-    } else if (player.pose === 'hit' || player.pose === 'guard') time = Math.min(time, duration - 1);
-    else if (player.pose === 'jump') time = Math.min(duration - 1, time / 43 * duration);
-    else time %= duration;
-    for (const frame of sequence) {
-      time -= frame.t;
-      if (time < 0) return frame;
-    }
-    return sequence[sequence.length - 1];
+    return fighterFrame(player, battle);
   }
 
   drawFighter(player, battle) {
@@ -120,7 +124,7 @@ export class ArenaRenderer {
     const rect = character.rects[frame.id];
     if (!rect) return;
     const [sx, sy, w, h] = rect;
-    const scale = .83;
+    const scale = SPRITE_SCALE;
     ctx.save();
     ctx.fillStyle = '#0c071c69';
     ctx.beginPath(); ctx.ellipse(player.x, FLOOR + 3, 47 * (1 - Math.min(player.y, 180) / 320), 9, 0, 0, Math.PI * 2); ctx.fill();
@@ -163,33 +167,86 @@ export class ArenaRenderer {
 
   drawProjectile(p, frame) {
     const ctx = this.ctx;
+    const { rx, ry } = projectileShape(p);
     ctx.save(); ctx.translate(p.x, FLOOR - p.y); ctx.globalCompositeOperation = 'lighter';
     if (p.kind === 'trap') {
-      ctx.scale(1, .35); ctx.rotate(frame * .035); ctx.strokeStyle = p.color; ctx.lineWidth = 3;
+      ctx.scale(1, ry / rx); ctx.rotate(frame * .035); ctx.strokeStyle = p.color; ctx.lineWidth = 3;
       ctx.shadowColor = p.color; ctx.shadowBlur = 15;
       for (let i = 0; i < 2; i++) { ctx.rotate(Math.PI / 4); ctx.strokeRect(-p.radius * .7, -p.radius * .7, p.radius * 1.4, p.radius * 1.4); }
     } else {
       ctx.scale(p.vx > 0 ? 1 : -1, 1);
-      const glow = ctx.createRadialGradient(0, 0, 1, 0, 0, p.radius * 2.8);
-      glow.addColorStop(0, '#ffffff'); glow.addColorStop(.22, p.color); glow.addColorStop(1, p.color + '00');
-      ctx.fillStyle = glow; ctx.scale(p.kind === 'beam' ? 3.3 : p.kind === 'shot' ? 3 : 1.7, 1);
-      ctx.beginPath(); ctx.ellipse(-p.radius * .5, 0, p.radius * 2, p.radius * 1.1, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#fff5ed'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(-p.radius * 2, 0); ctx.lineTo(p.radius, 0); ctx.stroke();
+      ctx.scale(rx, ry);
+      const glow = ctx.createRadialGradient(0, 0, .1, 0, 0, 2);
+      glow.addColorStop(0, '#ffffff'); glow.addColorStop(.3, p.color); glow.addColorStop(1, p.color + '00');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.ellipse(-.3, 0, 2, 1.65, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff2e9'; ctx.beginPath(); ctx.ellipse(0, 0, 1, .8, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#fff5ed'; ctx.lineWidth = .08;
+      ctx.beginPath(); ctx.moveTo(-2, 0); ctx.lineTo(.7, 0); ctx.stroke();
     }
     ctx.restore();
   }
 
   drawParticles() {
     const ctx = this.ctx;
-    for (const p of this.particles) {
-      ctx.globalAlpha = Math.max(0, p.life / p.max);
+    for (const p of this.effects.particles) {
+      ctx.globalAlpha = Math.max(0, 1 - p.age / p.life);
       ctx.strokeStyle = p.color; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 2, p.y - p.vy * 2); ctx.stroke();
-      p.x += p.vx; p.y += p.vy; p.vx *= .92; p.vy = p.vy * .92 + .16; p.life--;
+      ctx.beginPath(); ctx.moveTo(p.x, FLOOR - p.y); ctx.lineTo(p.x - p.vx * 2, FLOOR - p.y + p.vy * 2); ctx.stroke();
     }
     ctx.globalAlpha = 1;
-    this.particles = this.particles.filter(p => p.life > 0);
+  }
+
+  drawImpacts() {
+    const ctx = this.ctx;
+    for (const impact of this.effects.impacts) {
+      const progress = impact.age / impact.life;
+      const radius = impact.size * (this.reducedMotion ? 1 : .6 + Math.min(1, impact.age / 4) * .5);
+      ctx.save(); ctx.translate(impact.x, FLOOR - impact.y); ctx.rotate(impact.angle);
+      ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (1 - progress) ** 1.5;
+      if (impact.type === 'block') {
+        ctx.strokeStyle = '#8edfff'; ctx.lineWidth = 3 * (1 - progress) + .5;
+        ctx.beginPath(); ctx.ellipse(0, 0, radius * .65, radius, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = '#e8fcff'; ctx.fillRect(-3, -3, 6, 6);
+      } else {
+        const texture = this.assets.image('impact.webp');
+        if (texture) ctx.drawImage(texture, -radius, -radius, radius * 2, radius * 2);
+        ctx.fillStyle = '#ffd083'; ctx.beginPath();
+        for (let i = 0; i < 16; i++) {
+          const angle = i * Math.PI / 8;
+          const length = radius * (i % 2 ? .16 : i % 4 ? .72 : 1);
+          const x = Math.cos(angle) * length, y = Math.sin(angle) * length;
+          if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+        }
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#fffaf2'; ctx.beginPath();
+        ctx.ellipse(0, 0, radius * .28, radius * .22, 0, 0, Math.PI * 2); ctx.fill();
+        if (impact.heavy) {
+          ctx.strokeStyle = '#ffe6b3'; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(0, 0, radius * (.7 + progress), 0, Math.PI * 2); ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+  }
+
+  drawHitboxes(battle) {
+    const ctx = this.ctx;
+    const box = (shape, color) => {
+      ctx.fillStyle = color + '20'; ctx.strokeStyle = color; ctx.lineWidth = 1;
+      ctx.fillRect(shape.left, FLOOR - shape.top, shape.right - shape.left, shape.top - shape.bottom);
+      ctx.strokeRect(shape.left, FLOOR - shape.top, shape.right - shape.left, shape.top - shape.bottom);
+    };
+    for (const player of battle.players) {
+      for (const shape of hurtboxes(player)) box(shape, '#7fdfff');
+      const active = attackBox(player);
+      if (active) box(active, '#ff668f');
+    }
+    for (const projectile of battle.projectiles) {
+      const { rx, ry } = projectileShape(projectile);
+      ctx.strokeStyle = '#ffdd78'; ctx.beginPath(); ctx.ellipse(projectile.x, FLOOR - projectile.y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    this.text('BODY / BLUE     ACTIVE ATTACK / PINK     PROJECTILE CORE / GOLD', 480, 480, 8, '#e3edf6', 'center');
   }
 
   drawHud(battle) {
@@ -261,9 +318,7 @@ export class ArenaRenderer {
     for (const notice of this.notices) {
       ctx.globalAlpha = Math.min(1, notice.life / 12);
       this.text(notice.text, notice.player ? 890 : 70, notice.type === 'super' ? 140 : 252, notice.type === 'super' ? 23 : 11, notice.type === 'guardbreak' ? '#ffb3a6' : '#e6e2ff', notice.player ? 'right' : 'left', notice.type === 'super' ? 'Georgia' : 'Arial', '500');
-      notice.life--;
     }
     ctx.globalAlpha = 1;
-    this.notices = this.notices.filter(n => n.life > 0);
   }
 }

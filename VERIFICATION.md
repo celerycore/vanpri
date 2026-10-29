@@ -1,11 +1,12 @@
 # Verification — 29 October 2026
 
-- `npm test`: **24 passed**, 0 failed, 0 skipped, including embedded manifest, ZIP and HTTP download tests.
-- `npm run build`: self-contained HTML, static website entry point and playable/source/website ZIPs generated successfully. The HTML is approximately 14.9 MiB.
+- `npm test`: **35 passed**, 0 failed, 0 skipped, including collision/effect regressions, embedded manifest, ZIP and HTTP download tests.
+- `npm run build`: self-contained HTML, static website entry point and playable/source/website ZIPs generated successfully. The HTML is approximately 17.2 MiB, including the additional crouching and aerial frames.
 - `python3 tests/browser_smoke.py`: **passed** in installed Chromium, with no page errors or failed HTTP responses.
+- `python3 tests/combat_browser.py`: **passed** for real contact sparks, crouching attacks, training hitbox outlines, paused effects, gold/blue effect pixels, and 100 extra renders without aging effects.
 - `python3 tests/downloads_browser.py`: **passed**, including actual saved browser downloads and gameplay with restricted preview permissions.
 - `python3 tests/preview_browser.py`: verifies the project entry and distribution with fetch completely disabled and restrictive preview permissions, including rendered combat, damage and browser file saves.
-- Asset validation: **1,051 fighter sprite rectangles and their anchors**, plus all assist atlas rectangles, decoded and checked within image bounds.
+- Asset validation: **1,510 fighter sprite rectangles and their anchors**, plus all assist atlas rectangles, decoded and checked within image bounds.
 
 Browser checks exercised:
 
@@ -22,6 +23,8 @@ Browser checks exercised:
 - Reopening the saved HTML and fighting with networking disabled, then downloading another playable copy while offline.
 - Hosting the source under a subfolder with gamepad permission disabled and Web Audio construction denied. Keyboard attacks still damage the rival.
 - Serving only the website ZIP's index.html under a nested address, including mobile download and touch gameplay.
+
+Combat regressions cover the active collision window and matching visible frame for all 90 standing/crouching/aerial normal attacks, crouching body height for all fighters, mirrored contact points, rear and airborne whiffs, grounded throws, equal simultaneous trades, actual overlap coordinates in damage events, fast projectile sweeps, ellipse-corner whiffs, high shots missing crouching heads, incoming projectile guard direction, effect expiry and bounded particle counts. The browser suite confirms fixed-clock spark/shake behavior while paused and distinct hit/guard rendering. The full gameplay and preview suites were rerun after these changes; the separate download suite records the earlier validated file-saving flow.
 
 The prior blank arena was reproduced: denying the Gamepad API caused an uncaught SecurityError and left the simulation at frame zero. Controller discovery now degrades gracefully, preserving keyboard and touch play. Website paths are relative, downloads use real browser file saves, and HTTP release endpoints provide attachment headers and complete verified bytes.
 

@@ -13,6 +13,7 @@ export class Input {
       if (!active() || document.querySelector('dialog[open]')) return;
       if (event.code === 'Escape' || event.code === 'KeyP') { event.preventDefault(); if (!event.repeat) pause(); return; }
       if (event.code === 'KeyR') { event.preventDefault(); if (!event.repeat) reset(); return; }
+      if (event.target.closest?.('input, select, textarea')) return;
       if (bindings.some(b => b[event.code])) { event.preventDefault(); this.keys.add(event.code); if (!event.repeat) this.pendingKeys.add(event.code); }
     });
     window.addEventListener('keyup', event => { this.keys.delete(event.code); });

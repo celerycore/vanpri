@@ -1,5 +1,6 @@
 // A new, fixed-step combat simulation. Original FM2K scripts supply visual frames,
 // not executable logic. All distances, damage and move rules below are adaptation values.
+import { meleeContact, projectileContact } from './combat-geometry.js';
 export const WIDTH = 960;
 export const HEIGHT = 540;
 export const FLOOR = 470;
@@ -74,7 +75,7 @@ export class Battle {
     if (player.character.id === 3 && ['heavy', 'throw'].includes(name)) damage *= 1.25;
     if (player.character.id === 8 && name === 'heavy') damage *= 1.18;
     if (name === 'throw') reach = next.reach;
-    player.attack = { ...next, name, id: ++this.serial, elapsed: 0, hasHit: false, spawned: false, reach, damage: Math.round(damage), facing: player.facing, low: !!input.down, aerial: player.y > 0 };
+    player.attack = { ...next, name, id: ++this.serial, elapsed: 0, hasHit: false, spawned: false, reach, damage: Math.round(damage), facing: player.facing, low: !!input.down && !player.y && ['light', 'medium', 'heavy'].includes(name), aerial: player.y > 0 };
     player.block = false;
     player.poseTime = 0;
     this.emit('swing', { player: player.index, move: name });
@@ -157,7 +158,7 @@ export class Battle {
       if (!player.attack && !player.stun) player.facing = enemy.x >= player.x ? 1 : -1;
       const movingAway = player.facing > 0 ? input.left : input.right;
       player.block = (!player.stun || player.blockStun) && !player.attack && (input.guard || movingAway || player.blockStun);
-      player.crouch = !!input.down && player.y === 0;
+      player.crouch = (!!input.down || player.attack?.low) && player.y === 0;
 
       if (!player.stun) {
         if (pressed('assist')) this.callAssist(player);
@@ -178,12 +179,11 @@ export class Battle {
         if (player.y <= 0) { player.y = 0; player.vy = 0; }
       }
       player.x = clamp(player.x, 75, WIDTH - 75);
-      if (player.attack) this.advanceAttack(player, enemy);
-      const pose = player.stun ? (player.block ? 'guard' : 'hit') : player.attack ? (player.attack.name === 'throw' ? 'heavy' : player.attack.name) : player.y > 0 ? 'jump' : player.crouch ? 'crouch' : player.block && input.guard ? 'guard' : (input.left || input.right) ? (movingAway ? 'back' : 'walk') : 'idle';
-      player.poseTime = pose === player.pose ? player.poseTime + 1 : 0;
-      player.pose = pose;
       player.previous = { ...input };
     }
+    // Update both players before testing contact. This removes player-one's
+    // movement/guard advantage and lets simultaneous active strikes trade.
+    for (const player of this.players) if (player.attack) this.advanceAttack(player);
     const [a, b] = this.players;
     const distance = b.x - a.x;
     if (Math.abs(distance) < 58 && Math.abs(a.y - b.y) < 90) {
@@ -191,6 +191,23 @@ export class Battle {
       const sign = distance >= 0 ? 1 : -1;
       a.x = clamp(a.x - correction * sign, 75, WIDTH - 75);
       b.x = clamp(b.x + correction * sign, 75, WIDTH - 75);
+    }
+    for (const player of this.players) {
+      const input = controls[player.index];
+      const away = player.facing > 0 ? input.left : input.right;
+      const pose = player.stun ? (player.block ? 'guard' : 'hit') : player.attack ? (player.attack.name === 'throw' ? 'heavy' : player.attack.name) : player.y > 0 ? 'jump' : player.crouch ? 'crouch' : player.block && input.guard ? 'guard' : (input.left || input.right) ? (away ? 'back' : 'walk') : 'idle';
+      player.poseTime = pose === player.pose ? player.poseTime + 1 : 0;
+      player.pose = pose;
+    }
+    const contacts = [];
+    for (const player of this.players) {
+      const enemy = this.players[1 - player.index], attack = player.attack;
+      if (!attack || attack.hasHit || enemy.invuln || enemy.hp <= 0) continue;
+      const point = meleeContact(player, enemy);
+      if (point) contacts.push({ player, enemy, attack, point });
+    }
+    for (const { player, enemy, attack, point } of contacts) {
+      attack.hasHit = this.hit(player, enemy, attack, attack.name === 'throw', point);
     }
     this.advanceHelpers();
     this.advanceProjectiles();
@@ -209,7 +226,7 @@ export class Battle {
     }
   }
 
-  advanceAttack(player, enemy) {
+  advanceAttack(player) {
     const attack = player.attack;
     attack.elapsed++;
     const ranged = (attack.name === 'special' || attack.name === 'super') && projectileKinds.has(player.character.kind);
@@ -226,33 +243,26 @@ export class Battle {
         this.projectiles.push({ owner: player.index, x: player.x + attack.facing * (45 - j * 48), y: player.y + 105 + j * 20,
           vx: attack.facing * (player.character.kind === 'shot' ? 14 : 9), life: 125,
           damage: count > 1 ? Math.round(attack.damage * .56) : attack.damage, radius: superMove ? 44 : player.character.kind === 'shot' ? 10 : 22,
-          super: superMove, color: player.character.color, stun: attack.stun, push: attack.push, kind: player.character.kind });
-      }
-    }
-    if (!ranged && !attack.hasHit && attack.elapsed >= attack.startup && attack.elapsed < attack.startup + attack.active) {
-      const dx = (enemy.x - player.x) * attack.facing;
-      const hitHeight = player.y + (attack.low ? 38 : attack.aerial ? 65 : 95);
-      const enemyHeight = enemy.crouch ? 85 : 182;
-      const vertical = hitHeight >= enemy.y - 15 && hitHeight <= enemy.y + enemyHeight + 20;
-      if (dx >= -22 && dx < attack.reach && vertical && (attack.name !== 'throw' || enemy.y === 0)) {
-        attack.hasHit = this.hit(player, enemy, attack, attack.name === 'throw');
+          super: superMove, name: attack.name, direction: attack.facing, color: player.character.color, stun: attack.stun, push: attack.push, kind: player.character.kind });
       }
     }
     if (attack.elapsed >= attack.startup + attack.active + attack.recovery) player.attack = null;
   }
 
-  hit(attacker, defender, hit, unguardable = false) {
+  hit(attacker, defender, hit, unguardable = false, contact = null) {
     if (defender.invuln || defender.hp <= 0) return false;
-    const guarding = !unguardable && defender.block && defender.guard > 0 && !defender.attack && (!hit.low || defender.crouch);
+    const direction = hit.direction || hit.facing || Math.sign(defender.x - attacker.x) || 1;
+    const guarding = !unguardable && defender.block && defender.facing === -direction && defender.guard > 0 && !defender.attack && (!hit.low || defender.crouch);
     const damage = guarding ? (hit.name === 'special' || hit.super ? Math.ceil(hit.damage * .08) : 0) : hit.damage;
     const trainingFloor = this.mode === 'training' ? 1 : 0;
     defender.hp = Math.max(trainingFloor, defender.hp - damage);
     defender.lastHit = this.frame;
     defender.flash = 7;
-    defender.vx = (defender.x >= attacker.x ? 1 : -1) * (guarding ? 3 : hit.push || 7);
+    defender.vx = direction * (guarding ? 3 : hit.push || 7);
     defender.stun = guarding ? 12 : hit.stun || 20;
     defender.blockStun = guarding;
     defender.invuln = guarding ? 5 : 8;
+    defender.poseTime = 0;
     if (guarding) {
       defender.guard = Math.max(0, defender.guard - hit.damage * .31);
       defender.pose = 'guard';
@@ -272,18 +282,22 @@ export class Battle {
     }
     attacker.meter = clamp(attacker.meter + (guarding ? 3 : damage * .12), 0, 100);
     defender.meter = clamp(defender.meter + damage * .075, 0, 100);
-    this.emit(guarding ? 'block' : 'hit', { x: defender.x, y: defender.y + (hit.low ? 45 : 110), damage, player: attacker.index, heavy: hit.damage > 95, color: attacker.character.color });
+    const point = contact || { x: defender.x - direction * 20, y: defender.y + (hit.low ? 40 : 115) };
+    this.emit(guarding ? 'block' : 'hit', { x: point.x, y: point.y, direction, move: hit.name || hit.kind, damage, player: attacker.index, heavy: hit.damage > 95, color: attacker.character.color });
     return true;
   }
 
   advanceProjectiles() {
     for (const projectile of this.projectiles) {
+      const oldX = projectile.x;
+      projectile.previousX = oldX;
       projectile.x += projectile.vx;
       projectile.life--;
       const defender = this.players[1 - projectile.owner];
-      const height = defender.crouch ? 80 : 180;
-      if (Math.abs(projectile.x - defender.x) < projectile.radius + 25 && projectile.y >= defender.y - projectile.radius && projectile.y <= defender.y + height + projectile.radius && !defender.invuln) {
-        if (this.hit(this.players[projectile.owner], defender, projectile)) projectile.life = 0;
+      const contact = !defender.invuln && projectileContact(projectile, oldX, projectile.x, defender);
+      if (contact) {
+        projectile.direction ||= Math.sign(projectile.vx) || Math.sign(defender.x - this.players[projectile.owner].x) || 1;
+        if (this.hit(this.players[projectile.owner], defender, projectile, false, contact)) projectile.life = 0;
       }
       if (projectile.x < -100 || projectile.x > WIDTH + 100) projectile.life = 0;
     }

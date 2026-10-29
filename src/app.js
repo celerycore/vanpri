@@ -118,7 +118,7 @@ const input = new Input({ active: () => playing, pause, reset: () => {
   if (battle?.mode !== 'training') return;
   battle.resetRound();
   renderer.health = [1000, 1000];
-  renderer.particles = []; renderer.notices = [];
+  renderer.resetEffects();
   input.clear(); announce('Fresh start. Make your next move.');
 } });
 
@@ -160,6 +160,7 @@ async function startMatch({ nextArcade = false, rematch = false } = {}) {
     if (token !== launchToken) return;
     battle = new Battle({ characters, assists: [selectedAssist, opponentAssist], mode, difficulty: $('difficulty').value, trainingDummy: $('dummy').value });
     renderer = new ArenaRenderer($('arena'), assets, manifest);
+    renderer.showHitboxes = $('show-hitboxes').checked;
     resultShown = false;
     $('match-label').textContent = { quick: 'QUICK MATCH / VS CPU', arcade: 'ARCADE / THE ROAD AHEAD', versus: 'LOCAL VERSUS / TWO PLAYERS', training: 'TRAINING / MAKE IT YOUR OWN' }[mode];
     $('match-title').textContent = `${characters[0].name}  ×  ${characters[1].name}`;
@@ -210,6 +211,7 @@ function loop(time) {
   previousTime = time;
   let ticks = 0;
   while (accumulator >= 1000 / 60 && ticks++ < 6) {
+    if (!battle.paused) renderer.updateEffects();
     if (renderer.hitStop > 0 && !battle.paused) renderer.hitStop--;
     else battle.step(input.read());
     handleEvents(battle.drainEvents());
@@ -262,9 +264,10 @@ $('touch-toggle').addEventListener('click', () => {
   document.body.classList.toggle('touch-ui', !controls.hidden);
 });
 $('dummy').addEventListener('change', () => { if (battle) battle.trainingDummy = $('dummy').value; });
+$('show-hitboxes').addEventListener('change', () => { if (renderer) renderer.showHitboxes = $('show-hitboxes').checked; });
 $('reset-training').addEventListener('click', () => {
   if (!battle || battle.mode !== 'training') return;
-  battle.resetRound(); renderer.health = [1000, 1000]; renderer.particles = []; renderer.notices = [];
+  battle.resetRound(); renderer.health = [1000, 1000]; renderer.resetEffects();
   input.clear(); $('arena').focus({ preventScroll: true }); announce('Training reset. A fresh start.');
 });
 

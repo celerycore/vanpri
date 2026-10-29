@@ -2,6 +2,7 @@ import { WIDTH, HEIGHT, FLOOR, MAX_HP, clamp } from './engine.js';
 import { assetUrl } from './asset-url.js';
 import { SPRITE_SCALE, fighterFrame, hurtboxes, attackBox, projectileShape } from './combat-geometry.js';
 import { ImpactEffects } from './impact-effects.js';
+import { COMBAT_DATA } from './combat-data.js';
 
 export class Assets {
   constructor() { this.images = new Map(); }
@@ -32,6 +33,7 @@ export class ArenaRenderer {
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.effects = new ImpactEffects({ reducedMotion: this.reducedMotion });
     this.showHitboxes = false;
+    this.cameraZoom = 1;
   }
   event(event) {
     if (event.type === 'hit' || event.type === 'block') {
@@ -46,7 +48,7 @@ export class ArenaRenderer {
     if (['super', 'assist', 'guardbreak'].includes(event.type)) this.notices.push({ ...event, life: event.type === 'super' ? 75 : 65 });
   }
 
-  updateEffects() {
+  updateEffects(battle = null) {
     this.effects.update();
     this.shake *= .76;
     this.shakeX = this.shake > .05 ? (Math.random() - .5) * this.shake * 2 : 0;
@@ -55,12 +57,19 @@ export class ArenaRenderer {
     this.superFlash = Math.max(0, this.superFlash - 1);
     for (const notice of this.notices) notice.life--;
     this.notices = this.notices.filter(notice => notice.life > 0);
+    if (battle) {
+      const top = Math.max(340, ...battle.players.map(player => player.y + (COMBAT_DATA[player.character.id]?.standing || 230)));
+      const target = clamp((FLOOR - 130) / top, .52, 1);
+      this.cameraZoom += (target - this.cameraZoom) * (target < this.cameraZoom ? .35 : .08);
+      this.cameraZoom = Math.min(this.cameraZoom, (FLOOR - 105) / top);
+    }
   }
 
   resetEffects() {
     this.effects.clear(); this.notices = [];
     this.hitStop = this.flash = this.shake = this.superFlash = 0;
     this.shakeX = this.shakeY = 0;
+    this.cameraZoom = 1;
   }
 
   text(text, x, y, size, color = '#fff5ec', align = 'left', font = 'Arial', weight = '600') {
@@ -100,12 +109,16 @@ export class ArenaRenderer {
       ctx.strokeStyle = '#f4b6d259'; ctx.lineWidth = 1;
       for (let i = 0; i < 14; i++) { ctx.beginPath(); ctx.moveTo(0, 90 + i * 27); ctx.lineTo(WIDTH, 60 + i * 27); ctx.stroke(); }
     }
+    ctx.save();
+    ctx.translate(WIDTH / 2, FLOOR); ctx.scale(this.cameraZoom, this.cameraZoom); ctx.translate(-WIDTH / 2, -FLOOR);
     for (const helper of battle.helpers) this.drawAssist(helper);
     for (const player of [...battle.players].sort((a, b) => a.y - b.y)) this.drawFighter(player, battle);
     for (const projectile of battle.projectiles) this.drawProjectile(projectile, battle.frame);
     if (this.showHitboxes && battle.mode === 'training') this.drawHitboxes(battle);
     this.drawImpacts();
     this.drawParticles();
+    ctx.restore();
+    if (this.showHitboxes && battle.mode === 'training') this.text('BODY / BLUE     ACTIVE ATTACK / PINK     PROJECTILE CORE / GOLD', 480, 480, 8, '#e3edf6', 'center');
     ctx.restore();
     if (this.flash > 0 && !this.reducedMotion) { ctx.fillStyle = '#fff2d821'; ctx.fillRect(0, 0, WIDTH, HEIGHT); }
     this.drawHud(battle);
@@ -137,6 +150,13 @@ export class ArenaRenderer {
     const y = -h * scale;
     if (player.index === 1 && battle.players[0].character.id === character.id) ctx.filter = 'hue-rotate(140deg)';
     if (player.flash > 0) ctx.filter = (player.block ? 'brightness(1.6) drop-shadow(0 0 6px #90dfff)' : 'brightness(1.8) drop-shadow(0 0 6px #ffb4cb)');
+    if (!this.reducedMotion && (player.dashKind || player.runDirection) && Math.abs(player.moveVx) > 3) {
+      for (let trail = 3; trail >= 1; trail--) {
+        ctx.globalAlpha = .16 / trail;
+        ctx.drawImage(image, sx, sy, w, h, Math.round(x - player.moveVx * player.facing * trail * 1.5), Math.round(y), w * scale, h * scale);
+      }
+      ctx.globalAlpha = 1;
+    }
     ctx.drawImage(image, sx, sy, w, h, Math.round(x), Math.round(y), w * scale, h * scale);
     ctx.filter = 'none';
     ctx.restore();
@@ -246,7 +266,6 @@ export class ArenaRenderer {
       const { rx, ry } = projectileShape(projectile);
       ctx.strokeStyle = '#ffdd78'; ctx.beginPath(); ctx.ellipse(projectile.x, FLOOR - projectile.y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
     }
-    this.text('BODY / BLUE     ACTIVE ATTACK / PINK     PROJECTILE CORE / GOLD', 480, 480, 8, '#e3edf6', 'center');
   }
 
   drawHud(battle) {
@@ -271,6 +290,7 @@ export class ArenaRenderer {
       ctx.fillStyle = '#342b3d'; ctx.fillRect(x, 77, width * .6, 3);
       ctx.fillStyle = '#d8bd8c'; ctx.fillRect(x, 77, width * .6 * player.guard / 100, 3);
       this.text('CALCIUM', x, 92, 7, '#b6aab8');
+      this.text(`AIR JUMP ${player.airJumps ? '◇' : '·'}   AIR DASH ${player.airDashes ? '◇' : '·'}`, x + width, 92, 7, '#a6cabc', 'right');
       for (let n = 0; n < 2; n++) {
         ctx.beginPath(); ctx.arc(i ? x + 337 - n * 20 : x + 336 - n * 20, 81, 4.5, 0, Math.PI * 2);
         ctx.fillStyle = battle.wins[i] > n ? color : '#463747'; ctx.fill();

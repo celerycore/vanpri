@@ -120,7 +120,10 @@ def main():
             'airLight':frames(game,220 if number in (2,4) else 233 if number==5 else 216,10),
             'airMedium':frames(game,215 if number==2 else 214 if number==4 else 221 if number==5 else 220,12),
             'airHeavy':frames(game,214 if number==2 else 220 if number==4 else 241 if number==5 else 232,14),
+            'run':frames(game,33,12),'backdash':frames(game,37,10),'airDash':frames(game,43,8),
         }
+        for key,fallback in [('run','walk'),('backdash','back'),('airDash','jump')]:
+            if not anim[key]:anim[key]=anim[fallback]
         for key in anim:
             if not anim[key]:anim[key]=anim['medium'] or anim['idle']
         ids={f['id'] for sequence in anim.values() for f in sequence}

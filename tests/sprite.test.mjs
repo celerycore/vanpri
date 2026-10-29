@@ -32,7 +32,7 @@ test('combat inspection matches the real battle frame and active box on every ti
     battle.phase = 'fight';
     const player = battle.players[0]; player.x = 100; player.meter = 100;
     battle.players[1].x = 850;
-    if (animation.startsWith('air')) player.y = 1;
+    if (animation.startsWith('air')) player.y = 1000;
     battle.startMove(player, clip.move.name, { down: animation.startsWith('low') });
     assert.equal(clip.move.damage, player.attack.damage);
     for (let index = 0; index < clip.steps.length; index++) {

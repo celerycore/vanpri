@@ -52,7 +52,7 @@ export async function buildDistribution() {
     if (type) urls[name] = `data:${type};base64,${(await readFile(path.join(root, 'assets', name))).toString('base64')}`;
   }
   let code = '';
-  for (const name of ['game-manifest.js', 'combat-data.js', 'combat-geometry.js', 'impact-effects.js', 'asset-url.js', 'zip.js', 'downloads.js', 'engine.js', 'renderer.js', 'audio.js', 'input.js', 'sprite-data.js', 'sprite-inspector.js', 'app.js']) {
+  for (const name of ['game-manifest.js', 'combat-data.js', 'combat-geometry.js', 'movement.js', 'impact-effects.js', 'asset-url.js', 'zip.js', 'downloads.js', 'engine.js', 'renderer.js', 'audio.js', 'input.js', 'sprite-data.js', 'sprite-inspector.js', 'app.js']) {
     const source = await readFile(path.join(root, 'src', name), 'utf8');
     code += '\n' + source.replace(/^import .*?;\s*$/gm, '').replace(/^export (?=(?:class|const|let|function)\b)/gm, '');
   }

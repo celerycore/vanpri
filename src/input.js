@@ -1,6 +1,6 @@
 const bindings = [
-  { KeyA: 'left', KeyD: 'right', KeyW: 'up', KeyS: 'down', KeyJ: 'light', KeyK: 'medium', KeyL: 'heavy', KeyU: 'special', KeyI: 'assist', KeyO: 'super', Space: 'guard' },
-  { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', Digit1: 'light', Digit2: 'medium', Digit3: 'heavy', Digit4: 'special', Digit5: 'assist', Digit6: 'super', Digit0: 'guard', Numpad1: 'light', Numpad2: 'medium', Numpad3: 'heavy', Numpad4: 'special', Numpad5: 'assist', Numpad6: 'super', Numpad0: 'guard' },
+  { KeyA: 'left', KeyD: 'right', KeyW: 'up', KeyS: 'down', KeyJ: 'light', KeyK: 'medium', KeyL: 'heavy', KeyU: 'special', KeyI: 'assist', KeyO: 'super', Space: 'guard', ShiftLeft: 'dash' },
+  { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', Digit1: 'light', Digit2: 'medium', Digit3: 'heavy', Digit4: 'special', Digit5: 'assist', Digit6: 'super', Digit0: 'guard', Numpad1: 'light', Numpad2: 'medium', Numpad3: 'heavy', Numpad4: 'special', Numpad5: 'assist', Numpad6: 'super', Numpad0: 'guard', ShiftRight: 'dash' },
 ];
 export class Input {
   constructor({ active, pause, reset }) {
@@ -57,7 +57,7 @@ export class Input {
       if ((pad.axes[0] || 0) > .28 || pressed(15)) state.right = true;
       if ((pad.axes[1] || 0) < -.45 || pressed(12)) state.up = true;
       if ((pad.axes[1] || 0) > .45 || pressed(13)) state.down = true;
-      for (const [index, name] of [[0, 'light'], [1, 'medium'], [2, 'heavy'], [3, 'special'], [4, 'guard'], [5, 'assist'], [7, 'super']]) if (pressed(index)) state[name] = true;
+      for (const [index, name] of [[0, 'light'], [1, 'medium'], [2, 'heavy'], [3, 'special'], [4, 'guard'], [5, 'assist'], [6, 'dash'], [7, 'super']]) if (pressed(index)) state[name] = true;
     }
     return result;
   }

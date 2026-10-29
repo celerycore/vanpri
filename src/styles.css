@@ -84,6 +84,11 @@ body:has(dialog[open]){overflow:hidden}
 .sprite-export{display:flex;flex-wrap:wrap;gap:6px}
 .sprite-export .subtle-button{flex:1;font-size:9px;padding:8px}
 .sprite-dialog .sprite-footnote{border-top:1px solid var(--line);margin:20px 0 0;padding-top:15px;font-size:10px;line-height:1.7;color:#96839f}
+.sprite-physics-note{font-size:9px;line-height:1.7;color:#96839f}
+.movement-note{font-size:10px;line-height:1.7;color:#b3a4bf;margin:10px 0}.movement-note kbd{font:9px monospace;color:var(--pink)}
+.touch-attacks .touch-dash{grid-column:4;grid-row:1;font-size:9px;background:#2e364a;border-color:#7e9bbb;color:#cee0ff}
+.touch-attacks .touch-guard{grid-row:2}
+.touch-attacks .touch-dash.active{background:#b8d2ff;color:#1c2432}
 @media(max-width:1100px){.header-edition{display:none}}
 @media(max-width:760px){
   .site-header,body.in-game .site-header{height:auto;min-height:96px;flex-wrap:wrap;justify-content:center;gap:9px;padding-top:13px;padding-bottom:10px}

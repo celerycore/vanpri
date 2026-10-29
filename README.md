@@ -38,12 +38,16 @@ Publishing a Codex cloud environment saves its development files; it does not cr
 - Sprite-based body and attack boxes, crouching and aerial attack poses, swept projectile collisions, and contact-positioned hit and guard sparks.
 - Keyboard, multitouch controls, and standard gamepad mappings. Pause, rematch, training reset, dummy behavior, mute and in-game help.
 - A sprite checker for all ten fighters, with frame stepping, combat timing, collision overlays and PNG/JSON exports.
+- Melty-inspired movement: faster walking/running, invulnerable backdash startup, high jumps, double jumps, air dashes, buffered inputs and hit-confirmed normal jump cancels.
 
 ## Controls
 
 | Action | Player 1 | Player 2 |
 | --- | --- | --- |
 | Move / jump / crouch | W A S D | Arrow keys |
+| Run / backdash / air dash | Left Shift + direction, or double-tap direction | Right Shift + direction, or double-tap direction |
+| Double jump | Press W again in the air | Press ↑ again in the air |
+| High jump | S then W quickly | ↓ then ↑ quickly |
 | Light / medium / heavy | J / K / L | 1 / 2 / 3 |
 | Special | U | 4 |
 | Assist | I | 5 |
@@ -55,7 +59,15 @@ Publishing a Codex cloud environment saves its development files; it does not cr
 
 Player two can use either the number row or numpad. On hit, cancel light → medium → heavy → special → Liberty Art. Release and press each move; holding an attack does not automatically repeat it. A low attack needs a crouching guard. Throws beat guard at close range. Call an assist to cover an approach or extend pressure.
 
-Gamepad: stick / D-pad to move, A / B / X attack, Y special, LB guard, RB assist, RT Liberty. The first connected pad controls player one; the second controls player two. Physical controller hardware was not available for testing. Touch controls appear on phones and can be toggled on desktop. Landscape orientation makes the arena larger.
+Gamepad: stick / D-pad to move, A / B / X attack, Y special, LB guard, RB assist, LT dash, RT Liberty. The first connected pad controls player one; the second controls player two. Controller dash mapping was checked with a simulated standard pad; physical controller hardware was not available. Touch controls include a dedicated **DASH** button and appear on phones or can be toggled on desktop. Landscape orientation makes the arena larger.
+
+## Movement
+
+Movement takes inspiration from Melty Blood Actress Again, with values tuned for this arena. Walking is 50% faster than the previous version. Double-tap toward the rival and hold to run; double-tap away to backdash. Shift plus direction performs the same actions. Backdash has six invulnerable startup frames and 16 total movement frames, with vulnerable recovery.
+
+Jumping launches immediately with a higher, faster arc. A quick down → up performs a high jump. Each airborne sequence gives you one double jump and one air dash, in either order; landing restores both. Air dashes have two startup frames, suspend vertical movement, and carry momentum into an attack. Ground runs carry speed into jumps, and aerial attacks keep drifting. The camera zooms out to frame higher air movement.
+
+Normal attacks can jump-cancel on a confirmed hit. Whiffs and guarded hits do not grant a jump cancel. Movement and attack inputs buffer for six game frames, and landing ends aerial attacks with two frames of landing recovery. Faster and heavier fighters retain different run speeds and gravity. This implements common Melty-style movement rather than the complete original game's character- and moon-specific rules.
 
 Training has no timer, gives unlimited Liberty, and heals the rival after a combo. The dummy can stand, guard, or fight back. Enable **Show hitboxes** to see blue body boxes, pink active attacks and gold projectile cores. Attacks only deal damage during their active frames. Gold hit sparks and blue guard sparks originate where the shapes meet and advance on the fixed game clock.
 
@@ -63,7 +75,7 @@ Training has no timer, gives unlimited Liberty, and heals the rival after a comb
 
 Choose **Sprite checker** in the website header, then select a fighter and animation. **Sprite sequence** follows the prepared sprite durations. **Combat timing** steps through the actual browser move one game frame at a time, showing startup, active frames, recovery and the return to neutral. It uses the same simulation, damage and collision code as the arena. Non-attack animations use sprite playback.
 
-Play at quarter, half, normal or double speed, scrub the timeline, or focus the preview and use the arrow keys to step, Home/End to jump, and Space to play or pause. Toggle hitboxes, the previous frame, mirroring and zoom. The side panel shows sprite IDs, durations, image dimensions, atlas crops, feet anchors, source offsets and collision coordinates. Save an original-size transparent **PNG** or the selected frame's **JSON** data.
+Play at quarter, half, normal or double speed, scrub the timeline, or focus the preview and use the arrow keys to step, Home/End to jump, and Space to play or pause. Toggle hitboxes, the previous frame, mirroring and zoom. The side panel shows sprite IDs, durations, image dimensions, atlas crops, feet anchors, source offsets, collision coordinates and movement physics. Run, backdash and air-dash sprites are inspectable too. Save an original-size transparent **PNG** or the selected frame's **JSON** data, including the fighter's movement profile.
 
 The checker pauses a running match and restores its prior pause state when closed. It also works in the offline game and restricted preview. Frame data describes this browser adaptation and the prepared sprites, not the original engine's complete move data.
 
@@ -82,10 +94,11 @@ With the server running, the additional real-browser suite is:
 python3 tests/browser_smoke.py
 python3 tests/combat_browser.py
 python3 tests/sprite_browser.py
+python3 tests/movement_browser.py
 python3 tests/downloads_browser.py
 ```
 
-These optional development checks need Python Playwright and Chromium. They cover real keyboard movement and damage, pause/help/reset, assists, Liberty Arts, every fighter and stage, player two, results/rematches, arcade progression, mobile touch and the standalone edition. The combat suite checks actual contact sparks, low attacks, guard colors, paused effects and extra renders without advancing the clock. The download suite actually saves both files in Chromium, checks the ZIP with Python's ZIP reader, reopens the downloaded game with networking disabled, and checks nested website hosting with gamepad permission blocked. Screenshots and results go into ignored `test-results/`.
+These optional development checks need Python Playwright and Chromium. They cover real keyboard movement and damage, pause/help/reset, assists, Liberty Arts, every fighter and stage, player two, results/rematches, arcade progression, mobile touch and the standalone edition. The movement suite checks dashes, air actions, jump cancels, camera framing, player-two controls, simulated controller mapping and offline touch dashing. The combat suite checks actual contact sparks, low attacks, guard colors, paused effects and extra renders without advancing the clock. The download suite actually saves both files in Chromium, checks the ZIP with Python's ZIP reader, reopens the downloaded game with networking disabled, and checks nested website hosting with gamepad permission blocked. Screenshots and results go into ignored `test-results/`.
 
 The standalone edition was verified in Chromium with networking disabled after the initial HTML load. This environment's managed browser blocks `file://` navigation, so automated direct-from-disk navigation could not be tested here. The standalone file embeds all runtime resources and uses no external requests.
 

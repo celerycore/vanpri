@@ -183,6 +183,7 @@ export class SpriteInspector {
     this.el('anchor').textContent = `${number(data.anchor.x)}, ${data.anchor.y}`;
     this.el('offset').textContent = `${data.sourceOffset.x}, ${data.sourceOffset.y}`;
     this.el('atlas').textContent = data.atlas.file;
+    for (const [id, key] of [['walk-speed', 'walkSpeed'], ['run-speed', 'runMax'], ['air-speed', 'airDashSpeed'], ['jump-speed', 'jumpSpeed'], ['gravity', 'gravity'], ['weight', 'weight']]) this.el(id).textContent = String(number(data.movement[key]));
     this.el('move-data').hidden = !data.move;
     this.el('no-move').hidden = !!data.move;
     if (data.move) {

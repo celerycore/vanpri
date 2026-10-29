@@ -1,4 +1,5 @@
 import { COMBAT_DATA } from './combat-data.js';
+import { MOVEMENT, movementProfile } from './movement.js';
 
 export const SPRITE_SCALE = .83;
 const bound = (value, low, high) => Math.max(low, Math.min(high, value));
@@ -38,7 +39,12 @@ export function fighterFrame(player, battle = null) {
   let time = player.poseTime;
   if (battle && ['roundover', 'matchover'].includes(battle.phase)) time = Math.min(duration - 1, (155 - battle.phaseTimer) * .75);
   else if (['hit', 'guard'].includes(player.pose)) time = Math.min(time, duration - 1);
-  else if (player.pose === 'jump') time = Math.min(duration - 1, time / 43 * duration);
+  else if (player.pose === 'jump') {
+    const flight = 2 * (player.jumpLaunchSpeed || MOVEMENT.jumpSpeed) / movementProfile(player.character).gravity;
+    time = Math.min(duration - 1, (player.airTime ?? time) / flight * duration);
+  }
+  else if (['airDash', 'backdash'].includes(player.pose)) time = Math.min(duration - 1, (player.dashAge || time) / (player.pose === 'airDash' ? MOVEMENT.airDashFrames : MOVEMENT.backdashFrames) * duration);
+  else if (player.pose === 'run') time = time * 1.5 % duration;
   else time %= duration;
   for (const frame of sequence) { time -= frame.t; if (time < 0) return frame; }
   return sequence[sequence.length - 1];

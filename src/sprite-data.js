@@ -1,9 +1,10 @@
 import { Battle } from './engine.js';
 import { COMBAT_DATA } from './combat-data.js';
 import { SPRITE_SCALE, fighterFrame, hurtboxes, attackBox } from './combat-geometry.js';
+import { movementProfile } from './movement.js';
 
 export const SPRITE_ANIMATION_NAMES = {
-  idle: 'Idle', walk: 'Walk forward', back: 'Walk backward', jump: 'Jump', crouch: 'Crouch',
+  idle: 'Idle', walk: 'Walk forward', back: 'Walk backward', run: 'Run', backdash: 'Backdash', airDash: 'Air dash', jump: 'Jump', crouch: 'Crouch',
   light: 'Light attack', medium: 'Medium attack', heavy: 'Heavy attack', special: 'Special', super: 'Liberty Art',
   lowLight: 'Crouching light', lowMedium: 'Crouching medium', lowHeavy: 'Crouching heavy',
   airLight: 'Aerial light', airMedium: 'Aerial medium', airHeavy: 'Aerial heavy',
@@ -21,7 +22,7 @@ export function createSpriteClip(character, animation, requestedMode = 'animatio
   const battle = new Battle({ characters: [character, character], mode: 'versus' });
   battle.phase = 'fight';
   const player = battle.players[0];
-  player.x = 75; player.y = animation.startsWith('air') ? 1 : 0; player.meter = 100;
+  player.x = 75; player.y = animation.startsWith('air') ? 1000 : 0; player.meter = 100;
   battle.players[1].x = 885;
   if (isMove) battle.startMove(player, moveName, { down: animation.startsWith('low') });
   const attack = player.attack ? { ...player.attack } : null;
@@ -64,7 +65,7 @@ export function inspectSpriteFrame(clip, index, facing = 1) {
     anchor: { x: character.anchors[step.frame.id], y: height },
     sourceOffset: { x: step.frame.x, y: step.frame.y },
     scale: SPRITE_SCALE, facing,
-    bodyBoxes: hurtboxes(player, step.frame), attackBox: attackBox(player, step.frame), move: clip.move,
+    bodyBoxes: hurtboxes(player, step.frame), attackBox: attackBox(player, step.frame), move: clip.move, movement: movementProfile(character),
   };
 }
 

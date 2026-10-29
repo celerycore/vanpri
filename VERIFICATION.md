@@ -1,15 +1,18 @@
 # Verification — 29 October 2026
 
-- `npm test`: **40 passed**, 0 failed, 0 skipped, including sprite inspection/playback, collision/effect regressions, embedded manifest, ZIP and HTTP download tests.
-- `npm run build`: self-contained HTML, static website entry point and playable/source/website ZIPs generated successfully. The HTML is approximately 17.2 MiB, including the additional crouching and aerial frames.
+- `npm test`: **56 passed**, 0 failed, 0 skipped, including movement, sprite inspection/playback, collision/effect regressions, embedded manifest, ZIP and HTTP download tests.
+- `npm run build`: self-contained HTML, static website entry point and playable/source/website ZIPs generated successfully. The HTML is approximately 17.9 MiB, including run, backdash and air-dash frames.
 - `python3 tests/browser_smoke.py`: **passed** in installed Chromium, with no page errors or failed HTTP responses.
 - `python3 tests/combat_browser.py`: **passed** for real contact sparks, crouching attacks, training hitbox outlines, paused effects, gold/blue effect pixels, and 100 extra renders without aging effects.
 - `python3 tests/sprite_browser.py`: **passed** for frame selection, variable-speed playback, actual move timing, transparent PNG and JSON exports, mirrored hitboxes, closing during load, preserving match pause state, mobile/offline use and recovery after an atlas fails to load.
+- `python3 tests/movement_browser.py`: **passed** for double-tap running, high/double jumps, one air dash per flight, camera framing, backdash, a hit-confirmed jump cancel, player-two Shift, simulated gamepad LT, movement inspector data and mobile offline dash controls.
 - `python3 tests/downloads_browser.py`: **passed**, including actual saved browser downloads and gameplay with restricted preview permissions.
 - `python3 tests/preview_browser.py`: verifies the project entry and distribution with fetch completely disabled and restrictive preview permissions, including rendered combat, damage and browser file saves.
-- Asset validation: **1,510 fighter sprite rectangles and their anchors**, plus all assist atlas rectangles, decoded and checked within image bounds.
+- Asset validation: **1,636 fighter sprite rectangles and their anchors**, plus all assist atlas rectangles, decoded and checked within image bounds.
 
-Sprite checks compare every prepared animation's IDs, durations, crops and anchors against the manifest. All 110 standing/crouching/aerial normals, specials and Liberty Arts are compared with the real battle on every game frame, including active collision shapes and returning to neutral. Playback is checked at 30, 60, 120 and 144 Hz. The full gameplay smoke suite was rerun after adding the checker; the combat, preview and download suites also record their earlier validated behavior.
+Sprite checks compare every prepared animation's IDs, durations, crops and anchors against the manifest. All 110 standing/crouching/aerial normals, specials and Liberty Arts are compared with the real battle on every game frame, including active collision shapes and returning to neutral. Playback is checked at 30, 60, 120 and 144 Hz. The full gameplay, combat and sprite-browser suites were rerun after adding movement; the preview and download suites also record their earlier validated behavior.
+
+Movement checks cover faster walk/run speeds, weight differences, double-tap edge/window handling, mirrored dash inputs, finite backdash invulnerability, normal/high jump arcs, preserved run and aerial-attack momentum, independent one-use air jump/dash budgets in both orders, instant-air-dash buffering, startup attack buffering, confirmed-hit jump cancels, no jump cancels on guard/whiff, buffer expiry, landing recovery, pause/resource preservation and 12,000 mixed-input simulation ticks across all ten fighters. Browser tests confirm higher jumps remain inside the canvas while the HUD stays fixed. Movement values are tuned for this adaptation and do not claim exact Actress Again physics.
 
 Browser checks exercised:
 

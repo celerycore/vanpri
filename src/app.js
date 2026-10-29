@@ -113,6 +113,7 @@ function pause(force) {
   $('pause-cover').hidden = !value;
   $('pause-button').innerHTML = value ? 'Resume <kbd>Esc</kbd>' : 'Pause <kbd>Esc</kbd>';
   input.clear(); sound.pause(value);
+  battle.clearInputBuffers();
   if (!value) { $('arena').focus({ preventScroll: true }); previousTime = performance.now(); accumulator = 0; }
 }
 
@@ -213,7 +214,7 @@ function loop(time) {
   previousTime = time;
   let ticks = 0;
   while (accumulator >= 1000 / 60 && ticks++ < 6) {
-    if (!battle.paused) renderer.updateEffects();
+    if (!battle.paused) renderer.updateEffects(battle);
     if (renderer.hitStop > 0 && !battle.paused) renderer.hitStop--;
     else battle.step(input.read());
     handleEvents(battle.drainEvents());

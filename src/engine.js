@@ -1,6 +1,7 @@
 // A new, fixed-step combat simulation. Original FM2K scripts supply visual frames,
 // not executable logic. All distances, damage and move rules below are adaptation values.
 import { meleeContact, projectileContact } from './combat-geometry.js';
+import { MOVEMENT, initialMovement, clearMovementInputs, cancelMovement, movementAttackLocked, attackMovement, queueMovement, advanceMovement } from './movement.js';
 export const WIDTH = 960;
 export const HEIGHT = 540;
 export const FLOOR = 470;
@@ -37,6 +38,7 @@ export class Battle {
 
   resetRound() {
     this.players = this.characters.map((character, i) => ({
+      ...initialMovement(),
       index: i, character, x: i ? 645 : 315, y: 0, vy: 0, vx: 0,
       facing: i ? -1 : 1, hp: MAX_HP, guard: 100, meter: this.mode === 'training' ? 100 : 0,
       assist: 100, assistId: this.assistChoices[i], attack: null, stun: 0, invuln: 0,
@@ -55,10 +57,12 @@ export class Battle {
   emit(type, data = {}) { this.events.push({ type, frame: this.frame, ...data }); }
   drainEvents() { const events = this.events; this.events = []; return events; }
 
+  clearInputBuffers() { for (const player of this.players) { clearMovementInputs(player); player.previous = {}; } }
+
   startMove(player, name, input) {
     const current = player.attack;
     const next = moves[name];
-    if (!next || player.stun > 0) return false;
+    if (!next || player.stun > 0 || movementAttackLocked(player)) return false;
     if (current && !(current.hasHit && next.level > current.level && current.elapsed >= current.startup)) return false;
     if (name === 'super' && player.meter < 100) {
       if (!player.index) this.emit('hint', { text: 'Build your Liberty meter to 100% first.' });
@@ -75,7 +79,8 @@ export class Battle {
     if (player.character.id === 3 && ['heavy', 'throw'].includes(name)) damage *= 1.25;
     if (player.character.id === 8 && name === 'heavy') damage *= 1.18;
     if (name === 'throw') reach = next.reach;
-    player.attack = { ...next, name, id: ++this.serial, elapsed: 0, hasHit: false, spawned: false, reach, damage: Math.round(damage), facing: player.facing, low: !!input.down && !player.y && ['light', 'medium', 'heavy'].includes(name), aerial: player.y > 0 };
+    attackMovement(player);
+    player.attack = { ...next, name, id: ++this.serial, elapsed: 0, hasHit: false, hitConfirmed: false, spawned: false, reach, damage: Math.round(damage), facing: player.facing, low: !!input.down && !player.y && ['light', 'medium', 'heavy'].includes(name), aerial: player.y > 0 };
     player.block = false;
     player.poseTime = 0;
     this.emit('swing', { player: player.index, move: name });
@@ -108,6 +113,7 @@ export class Battle {
       }
       if (distance > 155 && roll > .57) input.special = true;
       if (distance < 250 && roll > .94) input.up = true;
+      if (!easy && distance > 220 && roll > .25) input.dash = true;
       if (player.meter >= 100 && distance < 380 && roll > .65) input.super = true;
       if (player.assist >= 100 && distance < 390 && roll < (easy ? .025 : .09)) input.assist = true;
       if (distance < 75 && roll > .9) { input.medium = true; input.heavy = true; }
@@ -149,35 +155,28 @@ export class Battle {
       const pressed = key => input[key] && !player.previous[key];
       player.invuln = Math.max(0, player.invuln - 1);
       player.stun = Math.max(0, player.stun - 1);
+      player.landingLag = Math.max(0, player.landingLag - 1);
       if (!player.stun) player.blockStun = false;
       player.flash = Math.max(0, player.flash - 1);
       player.comboTimer = Math.max(0, player.comboTimer - 1);
       if (!player.comboTimer) { player.combo = 0; player.comboDamage = 0; }
       player.assist = Math.min(100, player.assist + .115);
       if (!player.block) player.guard = Math.min(100, player.guard + .17);
-      if (!player.attack && !player.stun) player.facing = enemy.x >= player.x ? 1 : -1;
+      if (!player.attack && !player.stun && !player.dashKind) player.facing = enemy.x >= player.x ? 1 : -1;
       const movingAway = player.facing > 0 ? input.left : input.right;
-      player.block = (!player.stun || player.blockStun) && !player.attack && (input.guard || movingAway || player.blockStun);
+      player.block = (!player.stun || player.blockStun) && !player.attack && !player.dashKind && (input.guard || movingAway || player.blockStun);
       player.crouch = (!!input.down || player.attack?.low) && player.y === 0;
-
+      queueMovement(player, input, this.frame);
+      const move = pressed('super') ? 'super' : input.medium && input.heavy && (pressed('medium') || pressed('heavy')) ? 'throw' : pressed('special') ? 'special' : pressed('heavy') ? 'heavy' : pressed('medium') ? 'medium' : pressed('light') ? 'light' : null;
+      if (move) player.attackBuffer = { name: move, until: this.frame + MOVEMENT.inputBuffer };
       if (!player.stun) {
         if (pressed('assist')) this.callAssist(player);
-        const move = pressed('super') ? 'super' : input.medium && input.heavy && (pressed('medium') || pressed('heavy')) ? 'throw' : pressed('special') ? 'special' : pressed('heavy') ? 'heavy' : pressed('medium') ? 'medium' : pressed('light') ? 'light' : null;
-        if (move) this.startMove(player, move, input);
-        if (!player.attack) {
-          if (pressed('up') && player.y === 0) { player.vy = 11.4; player.block = false; this.emit('jump', { player: player.index }); }
-          if (!input.guard && !player.crouch) {
-            const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-            player.x += direction * player.character.speed * (movingAway ? .73 : 1) * (player.y > 0 ? .8 : 1);
-          }
+        if (player.attackBuffer) {
+          const name = player.attackBuffer.name;
+          if (this.startMove(player, name, input) || name === 'super' && player.meter < 100) player.attackBuffer = null;
         }
       }
-      player.x += player.vx;
-      player.vx *= .80;
-      if (player.y > 0 || player.vy > 0) {
-        player.y += player.vy; player.vy -= .56;
-        if (player.y <= 0) { player.y = 0; player.vy = 0; }
-      }
+      advanceMovement(player, input, this.frame, (type, data = {}) => this.emit(type, { player: player.index, x: player.x, y: player.y, ...data }));
       player.x = clamp(player.x, 75, WIDTH - 75);
       player.previous = { ...input };
     }
@@ -195,7 +194,7 @@ export class Battle {
     for (const player of this.players) {
       const input = controls[player.index];
       const away = player.facing > 0 ? input.left : input.right;
-      const pose = player.stun ? (player.block ? 'guard' : 'hit') : player.attack ? (player.attack.name === 'throw' ? 'heavy' : player.attack.name) : player.y > 0 ? 'jump' : player.crouch ? 'crouch' : player.block && input.guard ? 'guard' : (input.left || input.right) ? (away ? 'back' : 'walk') : 'idle';
+      const pose = player.stun ? (player.block ? 'guard' : 'hit') : player.attack ? (player.attack.name === 'throw' ? 'heavy' : player.attack.name) : player.dashKind === 'air' ? 'airDash' : player.dashKind === 'back' ? 'backdash' : player.y > 0 ? 'jump' : player.crouch ? 'crouch' : player.runDirection ? 'run' : player.block && input.guard ? 'guard' : (input.left || input.right) ? (away ? 'back' : 'walk') : 'idle';
       player.poseTime = pose === player.pose ? player.poseTime + 1 : 0;
       player.pose = pose;
     }
@@ -263,6 +262,7 @@ export class Battle {
     defender.blockStun = guarding;
     defender.invuln = guarding ? 5 : 8;
     defender.poseTime = 0;
+    cancelMovement(defender);
     if (guarding) {
       defender.guard = Math.max(0, defender.guard - hit.damage * .31);
       defender.pose = 'guard';
@@ -273,6 +273,7 @@ export class Battle {
         this.emit('guardbreak', { player: defender.index, text: 'CALCIUM BREAK' });
       }
     } else {
+      if (hit.id) hit.hitConfirmed = true;
       defender.block = false;
       defender.attack = null;
       defender.pose = 'hit';

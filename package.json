@@ -1,0 +1,14 @@
+{
+  "name": "vanguard-princess-browser",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A playable browser adaptation using the supplied Vanguard Princess assets.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "build": "node tools/build-standalone.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": { "node": ">=18" }
+}

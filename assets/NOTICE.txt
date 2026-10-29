@@ -1,0 +1,3 @@
+Vanguard Princess artwork, sprites, stages and audio were extracted from the files supplied by the user.
+Original game: Tomoaki Sugeno. Licensed by eigoMANGA. All rights reserved.
+Browser combat and UI are a new adaptation, not the original 2D Fighter Maker engine.

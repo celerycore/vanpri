@@ -4,6 +4,8 @@ A playable browser adaptation made from the Vanguard Princess Windows files supp
 
 ## Play
 
+Play online at **[celerycore.github.io/vanpri](https://celerycore.github.io/vanpri/)**. The website also includes the sprite checker in its header.
+
 Open **`dist/Vanguard-Princess.html`** in a modern browser, or extract **`dist/downloads/Vanguard-Princess-Playable.zip`** and open its HTML file. This single file contains the whole game, including music. It needs no installation or network connection. The website also has **Download game** and **Download ZIP** buttons that save playable copies, including while using the standalone edition offline. If your browser or organization blocks opening local HTML files, use the development server below.
 
 To run from source, extract the source ZIP, open a terminal inside its `vanpri-browser` folder, and use Node.js 18 or newer:
@@ -35,6 +37,7 @@ Publishing a Codex cloud environment saves its development files; it does not cr
 - Three CPU difficulties, best-of-three rounds, a 90-second timer, blocking, crouch guarding, throws, projectiles, guard breaks, hit-confirmed cancels and full-meter Liberty Arts.
 - Sprite-based body and attack boxes, crouching and aerial attack poses, swept projectile collisions, and contact-positioned hit and guard sparks.
 - Keyboard, multitouch controls, and standard gamepad mappings. Pause, rematch, training reset, dummy behavior, mute and in-game help.
+- A sprite checker for all ten fighters, with frame stepping, combat timing, collision overlays and PNG/JSON exports.
 
 ## Controls
 
@@ -56,6 +59,14 @@ Gamepad: stick / D-pad to move, A / B / X attack, Y special, LB guard, RB assist
 
 Training has no timer, gives unlimited Liberty, and heals the rival after a combo. The dummy can stand, guard, or fight back. Enable **Show hitboxes** to see blue body boxes, pink active attacks and gold projectile cores. Attacks only deal damage during their active frames. Gold hit sparks and blue guard sparks originate where the shapes meet and advance on the fixed game clock.
 
+## Sprite checker
+
+Choose **Sprite checker** in the website header, then select a fighter and animation. **Sprite sequence** follows the prepared sprite durations. **Combat timing** steps through the actual browser move one game frame at a time, showing startup, active frames, recovery and the return to neutral. It uses the same simulation, damage and collision code as the arena. Non-attack animations use sprite playback.
+
+Play at quarter, half, normal or double speed, scrub the timeline, or focus the preview and use the arrow keys to step, Home/End to jump, and Space to play or pause. Toggle hitboxes, the previous frame, mirroring and zoom. The side panel shows sprite IDs, durations, image dimensions, atlas crops, feet anchors, source offsets and collision coordinates. Save an original-size transparent **PNG** or the selected frame's **JSON** data.
+
+The checker pauses a running match and restores its prior pause state when closed. It also works in the offline game and restricted preview. Frame data describes this browser adaptation and the prepared sprites, not the original engine's complete move data.
+
 ## Build and verify
 
 ```sh
@@ -70,6 +81,7 @@ With the server running, the additional real-browser suite is:
 ```sh
 python3 tests/browser_smoke.py
 python3 tests/combat_browser.py
+python3 tests/sprite_browser.py
 python3 tests/downloads_browser.py
 ```
 

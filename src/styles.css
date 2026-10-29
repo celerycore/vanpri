@@ -13,3 +13,89 @@ body.touch-ui .keyboard-guide{display:none}
 @media(max-width:760px){.download-panel{align-items:stretch;flex-direction:column;gap:20px;padding:24px 20px}.download-panel h2{font-size:27px}.download-actions{min-width:0}.download-button{padding:15px;font-size:11px}.site-header nav{gap:13px}.download-nav{font-size:10px}}
 @media(max-width:420px){.site-header nav{gap:9px}.site-header nav .text-button{font-size:9px}.download-panel{padding:20px 16px}.download-button{font-size:10px;padding:13px 12px}.download-button span{font-size:6px;letter-spacing:.7px}}
 .hitbox-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.hitbox-toggle input{margin:0;accent-color:var(--pink);width:14px;height:14px}
+
+/* Sprite checker */
+body:has(dialog[open]){overflow:hidden}
+.sprite-dialog{max-width:1160px;width:calc(100% - 40px);max-height:94dvh;padding:30px;overscroll-behavior:contain}
+.sprite-dialog .dialog-close{width:40px;height:40px;display:grid;place-items:center;top:8px;right:8px}
+.sprite-heading{padding-right:25px}
+.sprite-heading .eyebrow{font-size:9px;margin-bottom:12px}
+.sprite-heading .eyebrow span{color:#75627d;margin:0 7px}
+.sprite-heading h2{font-size:36px;margin-bottom:8px}
+.sprite-heading>p:last-child{color:var(--muted);font-size:12px;line-height:1.6;margin:0}
+.sprite-selectors{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;margin:24px 0 18px}
+.sprite-selectors .field-label{min-width:0}
+.sprite-selectors select{width:100%;height:40px}
+.sprite-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}
+.sprite-view{min-width:0}
+.sprite-preview{border:1px solid #4b3b51;background-color:#19161e;background-image:linear-gradient(45deg,#27222e 25%,transparent 25%),linear-gradient(-45deg,#27222e 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#27222e 75%),linear-gradient(-45deg,transparent 75%,#27222e 75%);background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0}
+.sprite-preview-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;background:#1b1722ec;min-height:42px;font-size:10px;color:#baacc2}
+.sprite-phase{padding:4px 6px;border:1px solid #665270;color:#d0bdda;font-size:8px;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.sprite-phase[data-phase="startup"]{color:#e6c18d;border-color:#a18150}
+.sprite-phase[data-phase="active"],.sprite-phase[data-phase="active pose"]{color:#ff9eb8;border-color:#cb5c80;background:#5d2b3f}
+.sprite-phase[data-phase="recovery"]{color:var(--mint);border-color:#5a8f7f}
+#sprite-canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:pan-y}
+.sprite-legend{display:flex;justify-content:center;gap:22px;background:#1b1722ec;padding:10px;font-size:9px;color:#a79aaf}
+.sprite-legend span{display:inline-flex;align-items:center;gap:6px}
+.sprite-legend i{width:7px;height:7px;display:inline-block;border:1px solid currentColor}
+.body-key{color:#7fdfff}.attack-key{color:#ff668f}.origin-key{color:#e6c18d}
+.sprite-transport{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.sprite-step-buttons{display:flex;gap:6px}
+.sprite-dialog .subtle-button{min-height:38px;padding:9px 12px;font-size:10px;white-space:nowrap}
+.sprite-dialog .sprite-play{min-width:80px;border-color:#a3748e;background:#493044;color:#ffdde6}
+#sprite-position{color:var(--pink);font:12px monospace;white-space:nowrap}
+.sprite-speed,.sprite-zoom{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted)}
+.sprite-speed select,.sprite-zoom select{height:32px;font-size:10px;padding-left:8px}
+.sprite-scrub{width:100%;margin:14px 0 10px;accent-color:var(--pink);cursor:pointer}
+.sprite-timeline{display:flex;gap:5px;overflow-x:auto;padding:3px 2px 10px;position:relative;scrollbar-width:thin;scrollbar-color:#7e5b74 #201b27}
+.sprite-timeline button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:0 0 38px;min-height:46px;border:1px solid #4a3e52;background:#29222f;font-size:10px;color:#bdafc5}
+.sprite-timeline button b{font-family:monospace;font-weight:400}
+.sprite-timeline button span{font-size:8px;color:#8f809a}
+.sprite-timeline button[data-phase="active"],.sprite-timeline button[data-phase="active pose"]{border-bottom:3px solid #e782a4}
+.sprite-timeline button[data-phase="startup"]{border-bottom:3px solid #b99a69}
+.sprite-timeline button[data-phase="recovery"]{border-bottom:3px solid #7da998}
+.sprite-timeline button[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#251927}
+.sprite-timeline button[aria-pressed="true"] span{color:#56374c}
+.sprite-view-options{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:10px 0;border-top:1px solid var(--line);margin-top:4px}
+.sprite-view-options>label{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#bbadc4;cursor:pointer}
+.sprite-dialog input[type="checkbox"]{accent-color:var(--pink);width:13px;height:13px;margin:0}
+.sprite-view-options .sprite-zoom{margin-left:auto}
+.sprite-keyboard-hint{font-size:9px;color:#8f8198;margin:8px 0 0;line-height:1.8}
+.sprite-keyboard-hint span{margin:0 6px}
+.sprite-keyboard-hint kbd{font:9px monospace;color:#c6b5cf;border:1px solid #4d3b59;padding:2px 4px}
+.sprite-details{min-width:0;background:#1e1925;border:1px solid #47374f;padding:18px}
+.sprite-data-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sprite-data-heading .eyebrow{font-size:8px;margin:0}
+.sprite-data-heading strong{font:26px Georgia,serif;color:#f6cddc}
+.sprite-metadata{margin:0}
+.sprite-metadata>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid #352a3d}
+.sprite-metadata dt{font-size:10px;color:#9e8ca9}
+.sprite-metadata dd{margin:0;color:#ded2e6;font:10px monospace;text-align:right;overflow-wrap:anywhere}
+.sprite-move-data{margin-top:20px}
+.sprite-move-data h3{font-weight:400;font-size:11px;color:#cebad8;margin:0 0 12px}
+.sprite-move-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.sprite-move-grid>div{padding:9px 4px;background:#302335;border:1px solid #53384f;text-align:center}
+.sprite-move-grid span{display:block;font-size:8px;color:#af91b2}
+.sprite-move-grid strong{display:block;font:19px Georgia,serif;color:#f3bfd1;margin-top:5px}
+.sprite-move-data p,.sprite-no-move{font-size:10px;color:#a996b4;line-height:1.7;margin:12px 0}
+.sprite-coordinates{border-top:1px solid #44324e;padding:12px 0;margin-top:16px}
+.sprite-coordinates summary{font-size:10px;color:#c0a8cd;cursor:pointer}
+.sprite-coordinates pre{font-size:9px;line-height:1.7;max-height:210px;overflow:auto;color:#a6d6e5;white-space:pre-wrap;overflow-wrap:anywhere}
+.sprite-export{display:flex;flex-wrap:wrap;gap:6px}
+.sprite-export .subtle-button{flex:1;font-size:9px;padding:8px}
+.sprite-dialog .sprite-footnote{border-top:1px solid var(--line);margin:20px 0 0;padding-top:15px;font-size:10px;line-height:1.7;color:#96839f}
+@media(max-width:1100px){.header-edition{display:none}}
+@media(max-width:760px){
+  .site-header,body.in-game .site-header{height:auto;min-height:96px;flex-wrap:wrap;justify-content:center;gap:9px;padding-top:13px;padding-bottom:10px}
+  .site-header nav{width:100%;justify-content:space-between;gap:10px}
+  .sprite-dialog{width:calc(100% - 16px);max-height:96dvh;padding:20px 14px}
+  .sprite-heading h2{font-size:29px}.sprite-heading>p:last-child{font-size:10px}.sprite-heading .eyebrow{font-size:7px;letter-spacing:1px}
+  .sprite-selectors{grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 14px}.sprite-selectors>label:last-child{grid-column:1/-1}
+  .sprite-layout{grid-template-columns:minmax(0,1fr);gap:18px}
+  .sprite-preview-heading{padding:10px;font-size:8px}.sprite-phase{font-size:7px;letter-spacing:0}
+  .sprite-legend{gap:15px;font-size:8px}.sprite-dialog .subtle-button{min-height:40px;padding:9px 11px}
+  .sprite-speed{font-size:9px;gap:4px}.sprite-speed select{max-width:62px}.sprite-step-buttons{gap:4px}.sprite-dialog .sprite-play{min-width:70px}
+  #sprite-position{font-size:10px}.sprite-view-options{gap:10px}.sprite-view-options>label{font-size:9px}.sprite-view-options .sprite-zoom{margin-left:0}
+  .sprite-details{padding:16px}.sprite-metadata dd{font-size:11px}.sprite-move-grid strong{font-size:24px}.sprite-move-grid span{font-size:10px}
+  .sprite-footnote{font-size:9px!important}.sprite-timeline button{min-height:46px;flex-basis:40px}
+}

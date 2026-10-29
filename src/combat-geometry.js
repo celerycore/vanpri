@@ -44,8 +44,7 @@ export function fighterFrame(player, battle = null) {
   return sequence[sequence.length - 1];
 }
 
-function frameGeometry(player) {
-  const frame = fighterFrame(player);
+function frameGeometry(player, frame = fighterFrame(player)) {
   return COMBAT_DATA[player.character.id]?.frames[frame.id] || { body: [0, 25, player.crouch ? 105 : 210], strike: { normal: [80, 85, 130], low: [70, 15, 55], air: [80, 20, 90] } };
 }
 
@@ -54,8 +53,8 @@ function worldBox(player, left, right, bottom, top, facing = player.facing) {
   return { left: Math.min(x0, x1), right: Math.max(x0, x1), bottom: player.y + bottom, top: player.y + top };
 }
 
-export function hurtboxes(player) {
-  const [center, half, height] = frameGeometry(player).body;
+export function hurtboxes(player, frame) {
+  const [center, half, height] = frameGeometry(player, frame).body;
   return [
     worldBox(player, center - half * .78, center + half * .78, 5, height * .43),
     worldBox(player, center - half, center + half, height * .34, height * .80),
@@ -63,12 +62,12 @@ export function hurtboxes(player) {
   ];
 }
 
-export function attackBox(player) {
+export function attackBox(player, frame) {
   const attack = player.attack;
   if (!attack || attack.elapsed < attack.startup || attack.elapsed >= attack.startup + attack.active) return null;
   if (['special', 'super'].includes(attack.name) && ['wave', 'shot', 'burst'].includes(player.character.kind)) return null;
   if (attack.name === 'throw') return worldBox(player, 12, 54, 55, 155, attack.facing);
-  const geometry = frameGeometry(player);
+  const geometry = frameGeometry(player, frame);
   const band = attack.low ? 'low' : attack.aerial ? 'air' : 'normal';
   const [extent, bottom, top] = geometry.strike[band];
   const inner = Math.max(3, geometry.body[0] + geometry.body[1] * .25);

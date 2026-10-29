@@ -1,12 +1,15 @@
 # Verification — 29 October 2026
 
-- `npm test`: **35 passed**, 0 failed, 0 skipped, including collision/effect regressions, embedded manifest, ZIP and HTTP download tests.
+- `npm test`: **40 passed**, 0 failed, 0 skipped, including sprite inspection/playback, collision/effect regressions, embedded manifest, ZIP and HTTP download tests.
 - `npm run build`: self-contained HTML, static website entry point and playable/source/website ZIPs generated successfully. The HTML is approximately 17.2 MiB, including the additional crouching and aerial frames.
 - `python3 tests/browser_smoke.py`: **passed** in installed Chromium, with no page errors or failed HTTP responses.
 - `python3 tests/combat_browser.py`: **passed** for real contact sparks, crouching attacks, training hitbox outlines, paused effects, gold/blue effect pixels, and 100 extra renders without aging effects.
+- `python3 tests/sprite_browser.py`: **passed** for frame selection, variable-speed playback, actual move timing, transparent PNG and JSON exports, mirrored hitboxes, closing during load, preserving match pause state, mobile/offline use and recovery after an atlas fails to load.
 - `python3 tests/downloads_browser.py`: **passed**, including actual saved browser downloads and gameplay with restricted preview permissions.
 - `python3 tests/preview_browser.py`: verifies the project entry and distribution with fetch completely disabled and restrictive preview permissions, including rendered combat, damage and browser file saves.
 - Asset validation: **1,510 fighter sprite rectangles and their anchors**, plus all assist atlas rectangles, decoded and checked within image bounds.
+
+Sprite checks compare every prepared animation's IDs, durations, crops and anchors against the manifest. All 110 standing/crouching/aerial normals, specials and Liberty Arts are compared with the real battle on every game frame, including active collision shapes and returning to neutral. Playback is checked at 30, 60, 120 and 144 Hz. The full gameplay smoke suite was rerun after adding the checker; the combat, preview and download suites also record their earlier validated behavior.
 
 Browser checks exercised:
 

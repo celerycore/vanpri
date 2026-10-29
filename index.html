@@ -27,13 +27,99 @@ body.touch-ui .keyboard-guide{display:none}
 @media(max-width:760px){.download-panel{align-items:stretch;flex-direction:column;gap:20px;padding:24px 20px}.download-panel h2{font-size:27px}.download-actions{min-width:0}.download-button{padding:15px;font-size:11px}.site-header nav{gap:13px}.download-nav{font-size:10px}}
 @media(max-width:420px){.site-header nav{gap:9px}.site-header nav .text-button{font-size:9px}.download-panel{padding:20px 16px}.download-button{font-size:10px;padding:13px 12px}.download-button span{font-size:6px;letter-spacing:.7px}}
 .hitbox-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.hitbox-toggle input{margin:0;accent-color:var(--pink);width:14px;height:14px}
+
+/* Sprite checker */
+body:has(dialog[open]){overflow:hidden}
+.sprite-dialog{max-width:1160px;width:calc(100% - 40px);max-height:94dvh;padding:30px;overscroll-behavior:contain}
+.sprite-dialog .dialog-close{width:40px;height:40px;display:grid;place-items:center;top:8px;right:8px}
+.sprite-heading{padding-right:25px}
+.sprite-heading .eyebrow{font-size:9px;margin-bottom:12px}
+.sprite-heading .eyebrow span{color:#75627d;margin:0 7px}
+.sprite-heading h2{font-size:36px;margin-bottom:8px}
+.sprite-heading>p:last-child{color:var(--muted);font-size:12px;line-height:1.6;margin:0}
+.sprite-selectors{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;margin:24px 0 18px}
+.sprite-selectors .field-label{min-width:0}
+.sprite-selectors select{width:100%;height:40px}
+.sprite-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start}
+.sprite-view{min-width:0}
+.sprite-preview{border:1px solid #4b3b51;background-color:#19161e;background-image:linear-gradient(45deg,#27222e 25%,transparent 25%),linear-gradient(-45deg,#27222e 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#27222e 75%),linear-gradient(-45deg,transparent 75%,#27222e 75%);background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0}
+.sprite-preview-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;background:#1b1722ec;min-height:42px;font-size:10px;color:#baacc2}
+.sprite-phase{padding:4px 6px;border:1px solid #665270;color:#d0bdda;font-size:8px;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.sprite-phase[data-phase="startup"]{color:#e6c18d;border-color:#a18150}
+.sprite-phase[data-phase="active"],.sprite-phase[data-phase="active pose"]{color:#ff9eb8;border-color:#cb5c80;background:#5d2b3f}
+.sprite-phase[data-phase="recovery"]{color:var(--mint);border-color:#5a8f7f}
+#sprite-canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:pan-y}
+.sprite-legend{display:flex;justify-content:center;gap:22px;background:#1b1722ec;padding:10px;font-size:9px;color:#a79aaf}
+.sprite-legend span{display:inline-flex;align-items:center;gap:6px}
+.sprite-legend i{width:7px;height:7px;display:inline-block;border:1px solid currentColor}
+.body-key{color:#7fdfff}.attack-key{color:#ff668f}.origin-key{color:#e6c18d}
+.sprite-transport{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.sprite-step-buttons{display:flex;gap:6px}
+.sprite-dialog .subtle-button{min-height:38px;padding:9px 12px;font-size:10px;white-space:nowrap}
+.sprite-dialog .sprite-play{min-width:80px;border-color:#a3748e;background:#493044;color:#ffdde6}
+#sprite-position{color:var(--pink);font:12px monospace;white-space:nowrap}
+.sprite-speed,.sprite-zoom{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted)}
+.sprite-speed select,.sprite-zoom select{height:32px;font-size:10px;padding-left:8px}
+.sprite-scrub{width:100%;margin:14px 0 10px;accent-color:var(--pink);cursor:pointer}
+.sprite-timeline{display:flex;gap:5px;overflow-x:auto;padding:3px 2px 10px;position:relative;scrollbar-width:thin;scrollbar-color:#7e5b74 #201b27}
+.sprite-timeline button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:0 0 38px;min-height:46px;border:1px solid #4a3e52;background:#29222f;font-size:10px;color:#bdafc5}
+.sprite-timeline button b{font-family:monospace;font-weight:400}
+.sprite-timeline button span{font-size:8px;color:#8f809a}
+.sprite-timeline button[data-phase="active"],.sprite-timeline button[data-phase="active pose"]{border-bottom:3px solid #e782a4}
+.sprite-timeline button[data-phase="startup"]{border-bottom:3px solid #b99a69}
+.sprite-timeline button[data-phase="recovery"]{border-bottom:3px solid #7da998}
+.sprite-timeline button[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#251927}
+.sprite-timeline button[aria-pressed="true"] span{color:#56374c}
+.sprite-view-options{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:10px 0;border-top:1px solid var(--line);margin-top:4px}
+.sprite-view-options>label{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#bbadc4;cursor:pointer}
+.sprite-dialog input[type="checkbox"]{accent-color:var(--pink);width:13px;height:13px;margin:0}
+.sprite-view-options .sprite-zoom{margin-left:auto}
+.sprite-keyboard-hint{font-size:9px;color:#8f8198;margin:8px 0 0;line-height:1.8}
+.sprite-keyboard-hint span{margin:0 6px}
+.sprite-keyboard-hint kbd{font:9px monospace;color:#c6b5cf;border:1px solid #4d3b59;padding:2px 4px}
+.sprite-details{min-width:0;background:#1e1925;border:1px solid #47374f;padding:18px}
+.sprite-data-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sprite-data-heading .eyebrow{font-size:8px;margin:0}
+.sprite-data-heading strong{font:26px Georgia,serif;color:#f6cddc}
+.sprite-metadata{margin:0}
+.sprite-metadata>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid #352a3d}
+.sprite-metadata dt{font-size:10px;color:#9e8ca9}
+.sprite-metadata dd{margin:0;color:#ded2e6;font:10px monospace;text-align:right;overflow-wrap:anywhere}
+.sprite-move-data{margin-top:20px}
+.sprite-move-data h3{font-weight:400;font-size:11px;color:#cebad8;margin:0 0 12px}
+.sprite-move-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.sprite-move-grid>div{padding:9px 4px;background:#302335;border:1px solid #53384f;text-align:center}
+.sprite-move-grid span{display:block;font-size:8px;color:#af91b2}
+.sprite-move-grid strong{display:block;font:19px Georgia,serif;color:#f3bfd1;margin-top:5px}
+.sprite-move-data p,.sprite-no-move{font-size:10px;color:#a996b4;line-height:1.7;margin:12px 0}
+.sprite-coordinates{border-top:1px solid #44324e;padding:12px 0;margin-top:16px}
+.sprite-coordinates summary{font-size:10px;color:#c0a8cd;cursor:pointer}
+.sprite-coordinates pre{font-size:9px;line-height:1.7;max-height:210px;overflow:auto;color:#a6d6e5;white-space:pre-wrap;overflow-wrap:anywhere}
+.sprite-export{display:flex;flex-wrap:wrap;gap:6px}
+.sprite-export .subtle-button{flex:1;font-size:9px;padding:8px}
+.sprite-dialog .sprite-footnote{border-top:1px solid var(--line);margin:20px 0 0;padding-top:15px;font-size:10px;line-height:1.7;color:#96839f}
+@media(max-width:1100px){.header-edition{display:none}}
+@media(max-width:760px){
+  .site-header,body.in-game .site-header{height:auto;min-height:96px;flex-wrap:wrap;justify-content:center;gap:9px;padding-top:13px;padding-bottom:10px}
+  .site-header nav{width:100%;justify-content:space-between;gap:10px}
+  .sprite-dialog{width:calc(100% - 16px);max-height:96dvh;padding:20px 14px}
+  .sprite-heading h2{font-size:29px}.sprite-heading>p:last-child{font-size:10px}.sprite-heading .eyebrow{font-size:7px;letter-spacing:1px}
+  .sprite-selectors{grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 14px}.sprite-selectors>label:last-child{grid-column:1/-1}
+  .sprite-layout{grid-template-columns:minmax(0,1fr);gap:18px}
+  .sprite-preview-heading{padding:10px;font-size:8px}.sprite-phase{font-size:7px;letter-spacing:0}
+  .sprite-legend{gap:15px;font-size:8px}.sprite-dialog .subtle-button{min-height:40px;padding:9px 11px}
+  .sprite-speed{font-size:9px;gap:4px}.sprite-speed select{max-width:62px}.sprite-step-buttons{gap:4px}.sprite-dialog .sprite-play{min-width:70px}
+  #sprite-position{font-size:10px}.sprite-view-options{gap:10px}.sprite-view-options>label{font-size:9px}.sprite-view-options .sprite-zoom{margin-left:0}
+  .sprite-details{padding:16px}.sprite-metadata dd{font-size:11px}.sprite-move-grid strong{font-size:24px}.sprite-move-grid span{font-size:10px}
+  .sprite-footnote{font-size:9px!important}.sprite-timeline button{min-height:46px;flex-basis:40px}
+}
 </style>
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="#" aria-label="Vanguard Princess home"><span class="brand-symbol" aria-hidden="true">✧</span><span>VANGUARD<span class="brand-sub">P R I N C E S S</span></span></a>
     <div class="header-edition"><span class="status-dot"></span> BROWSER ARENA <span class="edition-divider">/</span> VOL. 01</div>
-    <nav aria-label="Main navigation"><a href="#downloads" class="text-button download-nav">Download</a><button class="text-button" id="how-button">How to play <span><svg class="arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M4 4h12v12" stroke="currentColor" stroke-width="1.4"/></svg></span></button><button class="icon-button audio-button" aria-label="Mute audio" title="Toggle audio">♫</button></nav>
+    <nav aria-label="Main navigation"><a href="#downloads" class="text-button download-nav">Download</a><button class="text-button" id="sprite-checker-button" aria-haspopup="dialog">Sprite checker</button><button class="text-button" id="how-button">How to play <span><svg class="arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M4 4h12v12" stroke="currentColor" stroke-width="1.4"/></svg></span></button><button class="icon-button audio-button" aria-label="Mute audio" title="Toggle audio">♫</button></nav>
   </header>
 
   <main id="menu" class="menu">
@@ -84,6 +170,35 @@ body.touch-ui .keyboard-guide{display:none}
     <div id="touch-controls" class="touch-controls" hidden><div class="touch-dpad"><button data-action="up" class="dpad-up" aria-label="Jump">↑</button><button data-action="left" class="dpad-left" aria-label="Move left">←</button><button data-action="down" class="dpad-down" aria-label="Crouch">↓</button><button data-action="right" class="dpad-right" aria-label="Move right">→</button></div><div class="touch-attacks"><button data-action="light">L<small>LIGHT</small></button><button data-action="medium">M<small>MEDIUM</small></button><button data-action="heavy">H<small>HEAVY</small></button><button data-action="special">S<small>SPECIAL</small></button><button data-action="assist">A<small>ASSIST</small></button><button data-action="super">✦<small>LIBERTY</small></button><button data-action="guard" class="touch-guard">GUARD</button></div></div>
     <p id="battle-status" class="battle-status" role="status" aria-live="polite">Ready when you are.</p>
   </main>
+
+  <dialog id="sprite-dialog" class="sprite-dialog" aria-labelledby="sprite-heading" aria-describedby="sprite-description">
+    <button class="dialog-close" data-close aria-label="Close sprite checker">×</button>
+    <div class="sprite-heading"><p class="eyebrow">FRAME LAB <span> / </span> THE DETAILS MATTER</p><h2 id="sprite-heading">Sprite checker.</h2><p id="sprite-description">Slow it down. Find the frame. See where the hit connects.</p></div>
+    <div class="sprite-selectors">
+      <label class="field-label">FIGHTER<select id="sprite-fighter"></select></label>
+      <label class="field-label">ANIMATION<select id="sprite-animation"></select></label>
+      <label class="field-label">PLAYBACK<select id="sprite-mode"><option value="animation">Sprite sequence</option><option value="combat">Combat timing · 60 Hz</option></select></label>
+    </div>
+    <div class="sprite-layout">
+      <section class="sprite-view" aria-label="Sprite preview and playback">
+        <div class="sprite-preview"><div class="sprite-preview-heading"><span id="sprite-status" role="status">Choose a fighter to inspect.</span><span id="sprite-phase" class="sprite-phase">Sprite sequence</span></div><canvas id="sprite-canvas" width="760" height="460" tabindex="0" aria-label="Sprite preview. Left and right arrows step frames, Home and End select the first and last frame, Space plays or pauses."></canvas><div class="sprite-legend"><span><i class="body-key"></i> Body</span><span><i class="attack-key"></i> Active attack</span><span><i class="origin-key"></i> Feet origin</span></div></div>
+        <div class="sprite-transport"><div class="sprite-step-buttons"><button id="sprite-previous" class="subtle-button" aria-label="Previous frame" title="Previous frame">←</button><button id="sprite-play" class="subtle-button sprite-play" aria-pressed="false">Play</button><button id="sprite-next" class="subtle-button" aria-label="Next frame" title="Next frame">→</button></div><output id="sprite-position" for="sprite-scrub" aria-live="off">01 / 16</output><label class="sprite-speed">Speed <select id="sprite-speed"><option value="0.25">¼×</option><option value="0.5">½×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div>
+        <label class="sr-only" for="sprite-scrub">Selected frame</label><input id="sprite-scrub" class="sprite-scrub" type="range" min="0" max="0" value="0" step="1">
+        <div id="sprite-timeline" class="sprite-timeline" role="group" aria-label="Frame timeline"></div>
+        <div class="sprite-view-options"><label><input id="sprite-boxes" type="checkbox" checked> Hitboxes</label><label><input id="sprite-onion" type="checkbox"> Previous frame</label><label><input id="sprite-flip" type="checkbox"> Flip</label><label class="sprite-zoom">Zoom <select id="sprite-zoom"><option value="1">Fit</option><option value="1.5">1.5× fit</option><option value="2">2× fit</option><option value="3">3× fit</option></select></label></div>
+        <p class="sprite-keyboard-hint">Focus the preview: <kbd>←</kbd> <kbd>→</kbd> step <span>·</span> <kbd>Space</kbd> play / pause</p>
+      </section>
+      <aside class="sprite-details" aria-label="Selected frame data">
+        <div class="sprite-data-heading"><span class="eyebrow">SELECTED SPRITE</span><strong id="sprite-id">—</strong></div>
+        <dl class="sprite-metadata"><div><dt>Sequence frame</dt><dd id="sprite-source-position">—</dd></div><div><dt>Sprite duration</dt><dd id="sprite-duration">—</dd></div><div><dt>Image size</dt><dd id="sprite-size">—</dd></div><div><dt>Atlas crop X, Y</dt><dd id="sprite-crop">—</dd></div><div><dt>Feet anchor X, Y</dt><dd id="sprite-anchor">—</dd></div><div><dt>Source offset X, Y</dt><dd id="sprite-offset">—</dd></div><div><dt>Atlas file</dt><dd id="sprite-atlas">—</dd></div></dl>
+        <section id="sprite-move-data" class="sprite-move-data" aria-label="Browser move timing" hidden><h3>Browser move timing</h3><div class="sprite-move-grid"><div><span>Startup</span><strong id="sprite-startup">—</strong></div><div><span>Active</span><strong id="sprite-active">—</strong></div><div><span>Recovery</span><strong id="sprite-recovery">—</strong></div><div><span>Base damage</span><strong id="sprite-damage">—</strong></div></div><p id="sprite-move-note"></p></section>
+        <p id="sprite-no-move" class="sprite-no-move">Choose an attack to inspect its startup, active frames, recovery and damage.</p>
+        <details class="sprite-coordinates"><summary>Collision coordinates</summary><pre id="sprite-coordinates"></pre></details>
+        <div class="sprite-export"><button id="sprite-png" class="subtle-button" title="Save the original-size sprite without overlays">Save sprite PNG</button><button id="sprite-json" class="subtle-button">Save frame JSON</button></div>
+      </aside>
+    </div>
+    <p class="sprite-footnote">1f = 1 tick at 60 Hz. Sprite durations describe the extracted animation; combat timing follows this browser game's rules. Blue boxes show the body. Pink boxes appear on active melee frames. These are adaptation values, not original-engine frame data.</p>
+  </dialog>
 
   <dialog id="help-dialog"><button class="dialog-close" data-close aria-label="Close controls">×</button><p class="eyebrow">A LITTLE FRIENDLY ADVICE</p><h2>Find your fighting spirit.</h2><p>Win two rounds to take the match. Hit your rival, protect your life bar, and call in a friend when you need a little backup.</p><div class="controls-table"><div class="table-head"><span>ACTION</span><span>PLAYER 1</span><span>PLAYER 2</span></div><div><span>Move / jump / crouch</span><span>W A S D</span><span>Arrow keys</span></div><div><span>Light / medium / heavy</span><span>J / K / L</span><span>1 / 2 / 3</span></div><div><span>Character special</span><span>U</span><span>4</span></div><div><span>Call assist partner</span><span>I</span><span>5</span></div><div><span>Liberty Art · full meter</span><span>O</span><span>6</span></div><div><span>Guard · or hold away</span><span>Space</span><span>0</span></div><div><span>Throw · at close range</span><span>K + L</span><span>2 + 3</span></div><div><span>Pause / reset training</span><span>Esc / R</span><span>—</span></div></div><div class="help-tips"><p><b>Keep it flowing.</b> On hit, cancel light → medium → heavy → special → Liberty Art. Release and press each attack again for the next move.</p><p><b>Watch your meters.</b> Land hits to charge Liberty. Assist recharges over time. Blocking drains your Calcium gauge; an empty gauge leaves you vulnerable. Crouch-guard against low attacks.</p><p><b>Play your way.</b> Gamepad: left stick / D-pad to move; A / B / X attack, Y special, LB guard, RB assist, RT Liberty. Player two can use a second gamepad. On a phone, use the on-screen controls; landscape gives you more room.</p></div><button class="primary-button" data-close>GOT IT. LET’S PLAY. <span><svg class="arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M4 4h12v12" stroke="currentColor" stroke-width="1.4"/></svg></span></button></dialog>
   <dialog id="about-dialog"><button class="dialog-close" data-close aria-label="Close about">×</button><p class="eyebrow">FAMILIAR FACES. A NEW ARENA.</p><h2>About this edition.</h2><p>This playable browser adaptation was built by studying the supplied Windows release, its 2D Fighter Maker 2002 data files, and game manual.</p><p>The ten main fighters, four partners, six stage backgrounds, music, and animation frames come from those supplied files. Combat, CPU behavior, balancing, menus, and one-button specials are newly implemented for the browser.</p><p>It is not an emulation or an exact port of the original engine. Original story sequences, the boss, alternate character variants, rollback networking, and the full original move system are not included. Local versus is shared-device play.</p><p class="credits">Original Vanguard Princess © Tomoaki Sugeno. Licensed by eigoMANGA. Original artwork and audio remain the property of their respective owners.</p><button class="primary-button" data-close>BACK TO THE ARENA <span><svg class="arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 16 16 4M4 4h12v12" stroke="currentColor" stroke-width="1.4"/></svg></span></button></dialog>
@@ -142,8 +257,7 @@ function fighterFrame(player, battle = null) {
   return sequence[sequence.length - 1];
 }
 
-function frameGeometry(player) {
-  const frame = fighterFrame(player);
+function frameGeometry(player, frame = fighterFrame(player)) {
   return COMBAT_DATA[player.character.id]?.frames[frame.id] || { body: [0, 25, player.crouch ? 105 : 210], strike: { normal: [80, 85, 130], low: [70, 15, 55], air: [80, 20, 90] } };
 }
 
@@ -152,8 +266,8 @@ function worldBox(player, left, right, bottom, top, facing = player.facing) {
   return { left: Math.min(x0, x1), right: Math.max(x0, x1), bottom: player.y + bottom, top: player.y + top };
 }
 
-function hurtboxes(player) {
-  const [center, half, height] = frameGeometry(player).body;
+function hurtboxes(player, frame) {
+  const [center, half, height] = frameGeometry(player, frame).body;
   return [
     worldBox(player, center - half * .78, center + half * .78, 5, height * .43),
     worldBox(player, center - half, center + half, height * .34, height * .80),
@@ -161,12 +275,12 @@ function hurtboxes(player) {
   ];
 }
 
-function attackBox(player) {
+function attackBox(player, frame) {
   const attack = player.attack;
   if (!attack || attack.elapsed < attack.startup || attack.elapsed >= attack.startup + attack.active) return null;
   if (['special', 'super'].includes(attack.name) && ['wave', 'shot', 'burst'].includes(player.character.kind)) return null;
   if (attack.name === 'throw') return worldBox(player, 12, 54, 55, 155, attack.facing);
-  const geometry = frameGeometry(player);
+  const geometry = frameGeometry(player, frame);
   const band = attack.low ? 'low' : attack.aerial ? 'air' : 'normal';
   const [extent, bottom, top] = geometry.strike[band];
   const inner = Math.max(3, geometry.body[0] + geometry.body[1] * .25);
@@ -1152,6 +1266,295 @@ class Input {
 
 
 
+const SPRITE_ANIMATION_NAMES = {
+  idle: 'Idle', walk: 'Walk forward', back: 'Walk backward', jump: 'Jump', crouch: 'Crouch',
+  light: 'Light attack', medium: 'Medium attack', heavy: 'Heavy attack', special: 'Special', super: 'Liberty Art',
+  lowLight: 'Crouching light', lowMedium: 'Crouching medium', lowHeavy: 'Crouching heavy',
+  airLight: 'Aerial light', airMedium: 'Aerial medium', airHeavy: 'Aerial heavy',
+  hit: 'Hit reaction', lowHit: 'Crouching hit reaction', guard: 'Guard', lowGuard: 'Crouching guard',
+  ko: 'Knockout', win: 'Victory',
+};
+
+// Use Battle.startMove and the same frame sampler/geometry as the arena. The
+// checker must not maintain a second set of timings, damage or collision rules.
+function createSpriteClip(character, animation, requestedMode = 'animation') {
+  const sequence = character.animations[animation];
+  if (!sequence?.length) throw new Error('This animation has no prepared frames.');
+  const moveName = animation.replace(/^(low|air)/, '').toLowerCase();
+  const isMove = ['light', 'medium', 'heavy', 'special', 'super'].includes(moveName);
+  const battle = new Battle({ characters: [character, character], mode: 'versus' });
+  battle.phase = 'fight';
+  const player = battle.players[0];
+  player.x = 75; player.y = animation.startsWith('air') ? 1 : 0; player.meter = 100;
+  battle.players[1].x = 885;
+  if (isMove) battle.startMove(player, moveName, { down: animation.startsWith('low') });
+  const attack = player.attack ? { ...player.attack } : null;
+  const mode = requestedMode === 'combat' && attack ? 'combat' : 'animation';
+  const peakIndex = COMBAT_DATA[character.id]?.peaks[animation] ?? null;
+  const steps = [];
+  if (mode === 'combat') {
+    const total = attack.startup + attack.active + attack.recovery;
+    for (let elapsed = 1; elapsed <= total; elapsed++) {
+      battle.step([{}, {}]);
+      const frame = fighterFrame(player);
+      const phase = elapsed === total ? 'ready' : elapsed < attack.startup ? 'startup' : elapsed < attack.startup + attack.active ? 'active' : 'recovery';
+      steps.push({ frame, sourceIndex: sequence.indexOf(frame), elapsed, phase, duration: 1 });
+    }
+  } else {
+    for (const [sourceIndex, frame] of sequence.entries()) {
+      steps.push({ frame, sourceIndex, elapsed: null, phase: attack && sourceIndex === peakIndex ? 'active pose' : 'sprite', duration: frame.t });
+    }
+  }
+  const move = attack ? { name: moveName, startup: attack.startup, active: attack.active, recovery: attack.recovery,
+    total: attack.startup + attack.active + attack.recovery, damage: attack.damage, low: attack.low, aerial: attack.aerial,
+    ranged: ['special', 'super'].includes(moveName) && ['wave', 'shot', 'burst'].includes(character.kind) } : null;
+  return { character, animation, mode, sequence, attack, move, peakIndex, steps, totalTicks: steps.reduce((sum, step) => sum + step.duration, 0) };
+}
+
+function inspectSpriteFrame(clip, index, facing = 1) {
+  const step = clip.steps[index];
+  if (!step) throw new Error('Frame is outside this animation.');
+  const { character, animation } = clip;
+  const [x, y, width, height] = character.rects[step.frame.id];
+  const elapsed = step.elapsed ?? (step.sourceIndex === clip.peakIndex ? clip.attack?.startup : 0);
+  const player = { character, x: 0, y: 0, facing, pose: animation, poseTime: 0,
+    crouch: animation === 'crouch' || animation.startsWith('low'),
+    attack: clip.attack && step.phase !== 'ready' ? { ...clip.attack, elapsed, facing } : null };
+  return {
+    fighter: character.name, fighterId: character.id, animation, playback: clip.mode,
+    frameIndex: index, sourceFrameIndex: step.sourceIndex, spriteId: step.frame.id,
+    gameFrame: step.elapsed, phase: step.phase, sourceDurationTicks: step.frame.t, playbackDurationTicks: step.duration, tickRate: 60,
+    atlas: { file: character.atlas, x, y, width, height },
+    anchor: { x: character.anchors[step.frame.id], y: height },
+    sourceOffset: { x: step.frame.x, y: step.frame.y },
+    scale: SPRITE_SCALE, facing,
+    bodyBoxes: hurtboxes(player, step.frame), attackBox: attackBox(player, step.frame), move: clip.move,
+  };
+}
+
+function advanceSpriteClock(clip, index, carry, ticks) {
+  // Whole loops return to the same position even with variable frame durations.
+  let remaining = carry + Math.max(0, ticks) % clip.totalTicks;
+  while (remaining + 1e-9 >= clip.steps[index].duration) {
+    remaining = Math.max(0, remaining - clip.steps[index].duration);
+    index = (index + 1) % clip.steps.length;
+  }
+  return { index, carry: remaining };
+}
+
+
+class SpriteInspector {
+  constructor({ dialog, manifest, assets }) {
+    this.dialog = dialog; this.manifest = manifest; this.assets = assets;
+    this.el = id => document.getElementById('sprite-' + id);
+    this.canvas = this.el('canvas'); this.ctx = this.canvas.getContext('2d');
+    this.index = 0; this.carry = 0; this.playing = false; this.token = 0; this.raf = 0;
+    this.el('fighter').replaceChildren(...manifest.characters.map(character => new Option(`${character.name} ${character.surname}`.trim(), character.id)));
+    this.el('fighter').addEventListener('change', () => { this.fillAnimations(); this.load(); });
+    for (const id of ['animation', 'mode']) this.el(id).addEventListener('change', () => this.load());
+    for (const id of ['boxes', 'onion', 'flip', 'zoom']) this.el(id).addEventListener('change', () => this.render());
+    this.el('speed').addEventListener('change', () => { this.lastTime = performance.now(); });
+    this.el('play').addEventListener('click', () => this.setPlaying(!this.playing));
+    this.el('previous').addEventListener('click', () => this.step(-1));
+    this.el('next').addEventListener('click', () => this.step(1));
+    this.el('scrub').addEventListener('input', () => this.seek(Number(this.el('scrub').value)));
+    this.el('timeline').addEventListener('click', event => {
+      const button = event.target.closest('[data-sprite-frame]');
+      if (button) this.seek(Number(button.dataset.spriteFrame));
+    });
+    this.canvas.addEventListener('keydown', event => {
+      if (!this.clip || this.loading) return;
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Space'].includes(event.code)) event.preventDefault();
+      if (event.code === 'ArrowLeft') this.step(-1);
+      if (event.code === 'ArrowRight') this.step(1);
+      if (event.code === 'Home') this.seek(0);
+      if (event.code === 'End') this.seek(this.clip.steps.length - 1);
+      if (event.code === 'Space' && !event.repeat) this.setPlaying(!this.playing);
+    });
+    this.el('json').addEventListener('click', () => {
+      if (!this.data || this.loading) return;
+      this.save(new Blob([JSON.stringify(this.data, null, 2)], { type: 'application/json' }), 'json');
+    });
+    this.el('png').addEventListener('click', () => this.savePng());
+    dialog.addEventListener('close', () => { this.token++; this.setPlaying(false); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.setPlaying(false); });
+    this.fillAnimations();
+  }
+
+  character() { return this.manifest.characters.find(character => character.id === Number(this.el('fighter').value)); }
+
+  fillAnimations() {
+    const previous = this.el('animation').value;
+    this.el('animation').replaceChildren(...Object.keys(SPRITE_ANIMATION_NAMES).filter(name => this.character().animations[name]?.length)
+      .map(name => new Option(SPRITE_ANIMATION_NAMES[name], name)));
+    if (this.character().animations[previous]) this.el('animation').value = previous;
+  }
+
+  open(characterId) {
+    this.el('fighter').value = String(characterId);
+    this.fillAnimations();
+    this.load();
+  }
+
+  async load() {
+    const token = ++this.token;
+    this.setPlaying(false); this.loading = true;
+    this.el('status').textContent = 'Loading sprites…';
+    this.canvas.dataset.ready = 'false';
+    for (const id of ['play', 'previous', 'next', 'scrub', 'json', 'png']) this.el(id).disabled = true;
+    this.el('timeline').replaceChildren();
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    try {
+      const character = this.character(), animation = this.el('animation').value;
+      this.clip = createSpriteClip(character, animation, this.el('mode').value);
+      this.el('mode').value = this.clip.mode;
+      this.el('mode').querySelector('[value="combat"]').disabled = !this.clip.move;
+      await this.assets.load([character.atlas]);
+      if (token !== this.token || !this.dialog.open) return;
+      this.index = 0; this.carry = 0; this.loading = false;
+      this.el('scrub').max = String(this.clip.steps.length - 1);
+      this.buildTimeline();
+      for (const id of ['play', 'previous', 'next', 'scrub', 'json', 'png']) this.el(id).disabled = false;
+      this.el('status').textContent = `${character.name} · ${SPRITE_ANIMATION_NAMES[animation]} · ${this.clip.steps.length} ${this.clip.mode === 'combat' ? 'game frames' : 'sprite frames'}`;
+      this.render();
+    } catch (error) {
+      if (token !== this.token || !this.dialog.open) return;
+      this.el('status').textContent = `Could not load these sprites: ${error.message}. Choose another fighter to try again.`;
+      this.loading = true;
+    }
+  }
+
+  buildTimeline() {
+    this.el('timeline').replaceChildren(...this.clip.steps.map((step, index) => {
+      const button = document.createElement('button');
+      button.type = 'button'; button.dataset.spriteFrame = String(index); button.dataset.phase = step.phase;
+      button.setAttribute('aria-label', `${this.clip.mode === 'combat' ? 'Game' : 'Sprite'} frame ${index + 1}, sprite ${step.frame.id}, ${step.phase}`);
+      const number = document.createElement('b'); number.textContent = String(index + 1).padStart(2, '0');
+      const duration = document.createElement('span'); duration.textContent = this.clip.mode === 'combat' ? step.phase === 'ready' ? '✓' : step.phase[0].toUpperCase() : `${step.duration}f`;
+      button.append(number, duration); return button;
+    }));
+  }
+
+  setPlaying(value) {
+    cancelAnimationFrame(this.raf);
+    this.playing = !!value && !!this.clip && !this.loading && this.dialog.open;
+    this.el('play').textContent = this.playing ? 'Pause' : 'Play';
+    this.el('play').setAttribute('aria-pressed', String(this.playing));
+    if (this.playing) { this.lastTime = performance.now(); this.raf = requestAnimationFrame(time => this.tick(time)); }
+  }
+
+  tick(time) {
+    if (!this.playing || !this.dialog.open) return;
+    const ticks = Math.min(250, time - this.lastTime) / (1000 / 60) * Number(this.el('speed').value);
+    this.lastTime = time;
+    const next = advanceSpriteClock(this.clip, this.index, this.carry, ticks);
+    this.carry = next.carry;
+    if (next.index !== this.index) { this.index = next.index; this.render(); }
+    this.raf = requestAnimationFrame(nextTime => this.tick(nextTime));
+  }
+
+  seek(index) {
+    if (!this.clip || this.loading) return;
+    this.setPlaying(false); this.index = index; this.carry = 0; this.render();
+    const selected = this.el('timeline').children[this.index];
+    const timeline = this.el('timeline');
+    if (selected.offsetLeft < timeline.scrollLeft || selected.offsetLeft + selected.offsetWidth > timeline.scrollLeft + timeline.clientWidth) timeline.scrollLeft = selected.offsetLeft - timeline.clientWidth / 2;
+  }
+
+  step(direction) {
+    if (!this.clip || this.loading) return;
+    this.seek((this.index + direction + this.clip.steps.length) % this.clip.steps.length);
+  }
+
+  render() {
+    if (!this.clip || this.loading || !this.dialog.open) return;
+    const clip = this.clip, ctx = this.ctx;
+    const data = inspectSpriteFrame(clip, this.index, this.el('flip').checked ? -1 : 1);
+    this.data = data;
+    this.canvas.dataset.ready = 'true'; this.canvas.dataset.spriteId = String(data.spriteId); this.canvas.dataset.phase = data.phase;
+    this.el('scrub').value = String(this.index);
+    this.el('position').textContent = `${String(this.index + 1).padStart(2, '0')} / ${String(clip.steps.length).padStart(2, '0')}`;
+    this.el('phase').textContent = data.phase === 'sprite' ? 'Sprite sequence' : data.phase;
+    this.el('phase').dataset.phase = data.phase;
+    for (const [index, button] of [...this.el('timeline').children].entries()) button.setAttribute('aria-pressed', String(index === this.index));
+    const selected = this.el('timeline').children[this.index], timeline = this.el('timeline');
+    if (this.playing && (selected.offsetLeft < timeline.scrollLeft || selected.offsetLeft + selected.offsetWidth > timeline.scrollLeft + timeline.clientWidth)) timeline.scrollLeft = selected.offsetLeft - timeline.clientWidth / 2;
+    this.updateData(data);
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    const origin = { x: this.canvas.width / 2, y: this.canvas.height - 42 };
+    // Fit the complete sequence, rather than resizing every frame as limbs move.
+    const frames = clip.steps.map(step => {
+      const rect = clip.character.rects[step.frame.id];
+      return { width: rect[2], height: rect[3], anchor: clip.character.anchors[step.frame.id] };
+    });
+    const extent = Math.max(...frames.flatMap(frame => [frame.anchor, frame.width - frame.anchor]));
+    const fit = Math.min((this.canvas.width / 2 - 24) / (extent * data.scale), (origin.y - 22) / (Math.max(...frames.map(frame => frame.height)) * data.scale));
+    const zoom = fit * Number(this.el('zoom').value);
+    ctx.save(); ctx.translate(origin.x, origin.y); ctx.scale(zoom, zoom); ctx.imageSmoothingEnabled = false;
+    const drawSprite = (frameData, alpha = 1) => {
+      const rect = frameData.atlas;
+      ctx.save(); ctx.globalAlpha = alpha; ctx.scale(data.facing, 1);
+      ctx.drawImage(this.assets.image(clip.character.atlas), rect.x, rect.y, rect.width, rect.height,
+        -frameData.anchor.x * data.scale, -rect.height * data.scale, rect.width * data.scale, rect.height * data.scale);
+      ctx.restore();
+    };
+    if (this.el('onion').checked && this.index > 0) drawSprite(inspectSpriteFrame(clip, this.index - 1), .22);
+    drawSprite(data);
+    if (this.el('boxes').checked) {
+      const drawBox = (box, color) => {
+        ctx.fillStyle = color + '18'; ctx.strokeStyle = color; ctx.lineWidth = 1 / zoom;
+        ctx.fillRect(box.left, -box.top, box.right - box.left, box.top - box.bottom);
+        ctx.strokeRect(box.left, -box.top, box.right - box.left, box.top - box.bottom);
+      };
+      for (const box of data.bodyBoxes) drawBox(box, '#7fdfff');
+      if (data.attackBox) drawBox(data.attackBox, '#ff668f');
+    }
+    ctx.restore();
+    ctx.strokeStyle = '#baacc060'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(20, origin.y + .5); ctx.lineTo(this.canvas.width - 20, origin.y + .5); ctx.stroke();
+    ctx.strokeStyle = '#e6c18d'; ctx.beginPath(); ctx.moveTo(origin.x - 6, origin.y); ctx.lineTo(origin.x + 6, origin.y); ctx.moveTo(origin.x, origin.y - 6); ctx.lineTo(origin.x, origin.y + 6); ctx.stroke();
+    ctx.font = '11px monospace'; ctx.fillStyle = '#b5a8bc'; ctx.fillText(`FEET ORIGIN  0, 0     ${Math.round(zoom * data.scale * 100)}% SOURCE SIZE`, 20, this.canvas.height - 15);
+  }
+
+  updateData(data) {
+    const number = value => Number(value.toFixed(2));
+    this.el('id').textContent = `#${data.spriteId}`;
+    this.el('source-position').textContent = data.sourceFrameIndex < 0 ? 'Neutral / ready' : `${data.sourceFrameIndex + 1} / ${this.clip.sequence.length}`;
+    this.el('duration').textContent = `${data.sourceDurationTicks}f · ${number(data.sourceDurationTicks * 1000 / 60)} ms`;
+    this.el('size').textContent = `${data.atlas.width} × ${data.atlas.height} px`;
+    this.el('crop').textContent = `${data.atlas.x}, ${data.atlas.y}`;
+    this.el('anchor').textContent = `${number(data.anchor.x)}, ${data.anchor.y}`;
+    this.el('offset').textContent = `${data.sourceOffset.x}, ${data.sourceOffset.y}`;
+    this.el('atlas').textContent = data.atlas.file;
+    this.el('move-data').hidden = !data.move;
+    this.el('no-move').hidden = !!data.move;
+    if (data.move) {
+      for (const key of ['startup', 'active', 'recovery']) this.el(key).textContent = `${data.move[key]}f`;
+      this.el('damage').textContent = String(data.move.damage);
+      this.el('move-note').textContent = data.move.ranged ? 'Projectile launches on the first active frame. Individual projectile damage may differ from base damage.' :
+        `${data.move.aerial ? 'Aerial' : data.move.low ? 'Low' : 'Standing'} attack · first active game frame: ${data.move.startup}.`;
+    }
+    this.el('coordinates').textContent = JSON.stringify({ units: 'game units, y upward from feet', body: data.bodyBoxes, attack: data.attackBox }, null, 2);
+  }
+
+  save(blob, extension, data = this.data) {
+    const url = URL.createObjectURL(blob), link = document.createElement('a');
+    link.href = url; link.download = `${data.fighter}-${data.animation}-${data.spriteId}.${extension}`;
+    this.dialog.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+
+  savePng() {
+    if (!this.data || this.loading) return;
+    const data = this.data, { atlas } = data, canvas = document.createElement('canvas'); canvas.width = atlas.width; canvas.height = atlas.height;
+    canvas.getContext('2d').drawImage(this.assets.image(this.clip.character.atlas), atlas.x, atlas.y, atlas.width, atlas.height, 0, 0, atlas.width, atlas.height);
+    canvas.toBlob(blob => { if (blob) this.save(blob, 'png', data); }, 'image/png');
+  }
+}
+
+
+
+
+
 
 
 
@@ -1167,6 +1570,7 @@ let animationId = 0;
 let launchToken = 0;
 let previousTime = 0, accumulator = 0;
 let resumeAfterDialog = false;
+let spriteInspector = null;
 let statusUntil = 0;
 const descriptions = [
   'A steady sword, a fearless heart. A versatile choice at any distance.',
@@ -1428,6 +1832,11 @@ function openDialog(id) {
 }
 for (const id of ['how-button', 'game-help']) $(id).addEventListener('click', () => openDialog('help-dialog'));
 $('about-button').addEventListener('click', () => openDialog('about-dialog'));
+$('sprite-checker-button').addEventListener('click', () => {
+  if (!spriteInspector || launching) return;
+  openDialog('sprite-dialog');
+  spriteInspector.open(battle?.players[0].character.id || selectedFighter);
+});
 for (const dialog of document.querySelectorAll('dialog')) {
   dialog.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => dialog.close()));
   dialog.addEventListener('click', event => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
@@ -1447,6 +1856,7 @@ Object.defineProperty(window, 'vanguard', { value: Object.freeze({ get battle() 
 try {
   manifest = GAME_MANIFEST;
   populateMenu();
+  spriteInspector = new SpriteInspector({ dialog: $('sprite-dialog'), manifest, assets });
 } catch (error) {
   console.error(error);
   $('menu-loading').textContent = `The game could not start: ${error.message}`;

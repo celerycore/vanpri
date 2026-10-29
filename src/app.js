@@ -5,6 +5,7 @@ import { Input } from './input.js';
 import { assetUrl } from './asset-url.js';
 import { setupDownloads } from './downloads.js';
 import { GAME_MANIFEST } from './game-manifest.js';
+import { SpriteInspector } from './sprite-inspector.js';
 
 const $ = id => document.getElementById(id);
 const sound = new Sound();
@@ -17,6 +18,7 @@ let animationId = 0;
 let launchToken = 0;
 let previousTime = 0, accumulator = 0;
 let resumeAfterDialog = false;
+let spriteInspector = null;
 let statusUntil = 0;
 const descriptions = [
   'A steady sword, a fearless heart. A versatile choice at any distance.',
@@ -278,6 +280,11 @@ function openDialog(id) {
 }
 for (const id of ['how-button', 'game-help']) $(id).addEventListener('click', () => openDialog('help-dialog'));
 $('about-button').addEventListener('click', () => openDialog('about-dialog'));
+$('sprite-checker-button').addEventListener('click', () => {
+  if (!spriteInspector || launching) return;
+  openDialog('sprite-dialog');
+  spriteInspector.open(battle?.players[0].character.id || selectedFighter);
+});
 for (const dialog of document.querySelectorAll('dialog')) {
   dialog.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => dialog.close()));
   dialog.addEventListener('click', event => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
@@ -297,6 +304,7 @@ Object.defineProperty(window, 'vanguard', { value: Object.freeze({ get battle() 
 try {
   manifest = GAME_MANIFEST;
   populateMenu();
+  spriteInspector = new SpriteInspector({ dialog: $('sprite-dialog'), manifest, assets });
 } catch (error) {
   console.error(error);
   $('menu-loading').textContent = `The game could not start: ${error.message}`;

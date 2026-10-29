@@ -1,6 +1,6 @@
 # Public website deployment
 
-The game is prepared for GitHub Pages in `celerycore/vanpri`.
+The game is hosted with GitHub Pages from `celerycore/vanpri` at **https://celerycore.github.io/vanpri/**. The site was verified to serve the complete game with HTTP 200.
 
 ## Pages configuration
 
@@ -12,7 +12,7 @@ Use **Settings → Pages → Build and deployment**:
 
 The generated root `index.html` includes the complete game. `.nojekyll` ensures GitHub serves the files directly. No Node server, package installation, API key or external asset host is needed to play the public site. The in-page download buttons create the offline game and ZIP in the browser.
 
-The expected address after successful Pages activation is `https://celerycore.github.io/vanpri/`. This is a deployment target, not a claim that the site is already live. Check the Pages status and make a real browser request after activation.
+Pages is configured to deploy `main` from the repository root. Pushes to that branch update the public game after GitHub's deployment completes. Check the Pages status and make a real browser request when verifying a new release.
 
 ## Updating the website
 
